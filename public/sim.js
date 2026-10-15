@@ -42,9 +42,14 @@
       highDeploy: (x, y) => at(x, y) === 1,
       inHalf: (team, x) => (team === "blue" ? x <= halfX : x >= halfX + 1),
       // 初始部署区（zones.initialDeploy，与地图配置同源）：有配置=只认矩形内（含端点）；无配置回退整半场
+      // 注意：各图的矩形只圈定「门口的地面位置」（这是设计如此，地面干员就只能在那些点下）。
+      // 高台（远程位）若也按该矩形判定，会出现在己方半场找不到任何可放格子的情况，
+      // 因此高台在己方半场内始终可作为部署点。
       inInitialDeploy: (team, x, y) => {
+        if (team === "blue" ? x > halfX : x < halfX + 1) return false;
+        if (at(x, y) === 1) return true;
         const rects = initZones && hasOwn(initZones, team) ? initZones[team] : null;
-        if (!Array.isArray(rects) || !rects.length) return (team === "blue" ? x <= halfX : x >= halfX + 1);
+        if (!Array.isArray(rects) || !rects.length) return true;
         return rects.some((r) => r && x >= r.x0 && x <= r.x1 && y >= r.y0 && y <= r.y1);
       },
     };

@@ -2041,6 +2041,10 @@
     return (z && (z[team] || z[state.team])) || null;
   }
   function inInitialZone(x, y, team) {
+    // 与服务端判定同源（sim.js 的 inInitialDeploy）：地面只认 zones.initialDeploy 矩形（各图门口的限定位置），
+    // 高台（远程位）在己方半场任意位置可用。两边必须一致，否则会出现「高亮不出格子 / 点了放不下去」。
+    const m = currentMap();
+    if (m && typeof m.inInitialDeploy === "function") return m.inInitialDeploy(team || state.team, x, y);
     const rects = initialDeployRects(team || state.team);
     if (!rects || !rects.length) return true;
     return rects.some((r) => x >= r.x0 && x <= r.x1 && y >= r.y0 && y <= r.y1);
@@ -2223,24 +2227,55 @@
     const view = state.view;
     if (!view) return;
     const keys = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "Q", "W"];
+    const hand = view.hand[state.team];
     const onField = new Set(view.units.filter((u) => u.team === state.team).map((u) => u.opId));
-    $("deploySlots").textContent = Math.max(0, view.hand[state.team].length - onField.size);
-    const signature = JSON.stringify([state.team, state.selectedOpId, Array.from(onField), view.hand[state.team], view.hand[state.team].map((s) => view.cost[state.team] >= (s.cost ?? operator(s.opId).cost))]);
-    if (state.handSignature === signature || state.cardDrag) return;
-    state.handSignature = signature;
-    $("hand").innerHTML = view.hand[state.team].map((slot, i) => {
-      const op = operator(slot.opId);
-      return `
-        <button class="handButton ${state.selectedOpId === slot.opId ? "active" : ""} ${slot.readyIn > 0 ? "dead" : ""} ${onField.has(op.id) ? "onField" : ""} ${view.cost[state.team] < (slot.cost ?? op.cost) ? "unaffordable" : ""}" data-id="${slot.opId}" title="${op.name}${onField.has(op.id) ? " · 在场，点击选中" : " · 拖动部署"}">
+    $("deploySlots").textContent = Math.max(0, hand.length - onField.size);
+
+    // 只在「卡片集合或顺序」变化时重建节点：快照 10Hz 下发、再部署倒计时每秒 -1，
+    // 若每次都重建 innerHTML，卡片入场动画（handCardEnter）会不断重播、头像也要重新解码 → 肉眼可见的每秒抖动。
+    const host = $("hand");
+    const structSig = `${state.team}|${hand.map((s) => s.opId).join(",")}`;
+    if (state.handStructSig !== structSig && !state.cardDrag) {
+      state.handStructSig = structSig;
+      host.innerHTML = hand.map((slot, i) => {
+        const op = operator(slot.opId);
+        return `
+        <button class="handButton" data-id="${slot.opId}">
           <img src="assets/avatars/${op.id}.webp" alt="${op.name}" draggable="false">
           <span class="hbCost">${keys[i]} · ${slot.cost ?? op.cost}</span>
           <span class="hbRole">${op.role}</span>
           <span class="hbName">${op.name}</span>
-          ${slot.readyIn > 0 ? `<span class="hbCd">${slot.readyIn}s</span>` : ""}
-          ${onField.has(op.id) ? '<span class="hbOnField">在场</span>' : ""}
         </button>
       `;
-    }).join("");
+      }).join("");
+    }
+
+    // 原地更新状态（不销毁节点 → 不重播动画、不重新解码头像）
+    hand.forEach((slot, i) => {
+      const btn = host.children[i];
+      if (!btn) return;
+      const op = operator(slot.opId);
+      const affordable = view.cost[state.team] >= (slot.cost ?? op.cost);
+      const isOnField = onField.has(op.id);
+      const cooling = slot.readyIn > 0;
+      btn.classList.toggle("active", state.selectedOpId === slot.opId);
+      btn.classList.toggle("dead", cooling);
+      btn.classList.toggle("cooldown", cooling);
+      btn.classList.toggle("onField", isOnField);
+      btn.classList.toggle("unaffordable", !affordable);
+      btn.classList.toggle("insufficient", !affordable);
+      btn.title = `${op.name}${isOnField ? " · 在场，点击选中" : " · 拖动部署"}`;
+      let cd = btn.querySelector(".hbCd");
+      if (cooling) {
+        if (!cd) { cd = document.createElement("span"); cd.className = "hbCd"; btn.appendChild(cd); }
+        const txt = `${slot.readyIn}s`;
+        if (cd.textContent !== txt) cd.textContent = txt;
+      } else if (cd) cd.remove();
+      let of = btn.querySelector(".hbOnField");
+      if (isOnField) {
+        if (!of) { of = document.createElement("span"); of.className = "hbOnField"; of.textContent = "在场"; btn.appendChild(of); }
+      } else if (of) of.remove();
+    });
   }
 
   function selectHandCard(opId) {
@@ -2292,7 +2327,7 @@
     if (!drag || drag.pointerId !== e.pointerId) return;
     state.cardDrag = null;
     $("deployDragPreview")?.remove();
-    state.handSignature = null;
+    state.handStructSig = null;
     if (drag.active) {
       state.suppressHandClick = true;
       if (drag.valid) deployAt(drag.opId, drag.tile);

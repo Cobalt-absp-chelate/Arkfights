@@ -52,3 +52,8 @@ coverage/
 ehthumbs.db
 Thumbs.db
 Desktop.ini
+
+# 本地回归测试脚本（开发用，不随仓库分发）
+deploy_test.js
+deploy_exhaustive.js
+highground_test.js
