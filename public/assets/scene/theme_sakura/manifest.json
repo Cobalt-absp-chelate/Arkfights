@@ -1,0 +1,101 @@
+{
+ "id": "sakura",
+ "label": "樱庭浅色（竞技场/溪谷）",
+ "maps": [
+  "valley"
+ ],
+ "note": "浅色调竞技图（非套色罩）：地面=map_courtyard/TX_Courtyard_D 奶油大理石+青瓷 mosaic，台面/台侧=map_church/TX_church_A 白雕石+深板岩（浅粉花瓣由构件强调色点缀）；BG 为教堂远景。",
+ "slots": {
+  "ground_top": {
+   "file": "theme_sakura/ground_top.png",
+   "bundle": "arts\\maps\\map_courtyard\\res.ab",
+   "texture": "TX_Courtyard_D",
+   "rect": [
+    27,
+    13,
+    720,
+    400
+   ],
+   "size": [
+    693,
+    387
+   ],
+   "kind": "原作贴图"
+  },
+  "ground_top2": {
+   "file": "theme_sakura/ground_top2.png",
+   "bundle": "arts\\maps\\map_courtyard\\res.ab",
+   "texture": "TX_Courtyard_D",
+   "rect": [
+    255,
+    730,
+    545,
+    985
+   ],
+   "size": [
+    290,
+    255
+   ],
+   "kind": "原作贴图"
+  },
+  "platform_top": {
+   "file": "theme_sakura/platform_top.png",
+   "bundle": "arts\\maps\\map_church\\res.ab",
+   "texture": "TX_church_A",
+   "rect": [
+    1200,
+    110,
+    1533,
+    400
+   ],
+   "size": [
+    333,
+    290
+   ],
+   "kind": "原作贴图"
+  },
+  "platform_top2": {
+   "file": "theme_sakura/platform_top2.png",
+   "bundle": "arts\\maps\\map_church\\res.ab",
+   "texture": "TX_church_A",
+   "rect": [
+    1627,
+    147,
+    2040,
+    453
+   ],
+   "size": [
+    413,
+    306
+   ],
+   "kind": "原作贴图"
+  },
+  "wall_side": {
+   "file": "theme_sakura/wall_side.png",
+   "bundle": "arts\\maps\\map_church\\res.ab",
+   "texture": "TX_church_A",
+   "rect": [
+    1320,
+    1600,
+    2040,
+    2040
+   ],
+   "size": [
+    720,
+    440
+   ],
+   "kind": "原作贴图"
+  },
+  "bg": {
+   "file": "theme_sakura/bg.png",
+   "bundle": "arts\\maps\\map_church\\res.ab",
+   "texture": "TX_Chuch_BG",
+   "rect": null,
+   "size": [
+    1024,
+    1024
+   ],
+   "kind": "原作贴图"
+  }
+ }
+}

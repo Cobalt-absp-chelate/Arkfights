@@ -1,0 +1,101 @@
+{
+ "id": "bamboo",
+ "label": "草地苔石（竹林/溪谷）",
+ "maps": [
+  "valley"
+ ],
+ "note": "TX_Bambooforest_D 含苔石板/泥地/草带/岩壁；BG 为竹林远景。",
+ "slots": {
+  "ground_top": {
+   "file": "theme_bamboo/ground_top.png",
+   "bundle": "arts\\maps\\map_bambooforest\\res.ab",
+   "texture": "TX_Bambooforest_D",
+   "rect": [
+    510,
+    155,
+    835,
+    285
+   ],
+   "size": [
+    325,
+    130
+   ],
+   "kind": "原作贴图"
+  },
+  "ground_top2": {
+   "file": "theme_bamboo/ground_top2.png",
+   "bundle": "arts\\maps\\map_bambooforest\\res.ab",
+   "texture": "TX_Bambooforest_D",
+   "rect": [
+    8,
+    258,
+    130,
+    372
+   ],
+   "size": [
+    122,
+    114
+   ],
+   "kind": "原作贴图"
+  },
+  "platform_top": {
+   "file": "theme_bamboo/platform_top.png",
+   "bundle": "arts\\maps\\map_bambooforest\\res.ab",
+   "texture": "TX_Bambooforest_D",
+   "rect": [
+    8,
+    8,
+    150,
+    148
+   ],
+   "size": [
+    142,
+    140
+   ],
+   "kind": "原作贴图"
+  },
+  "platform_top2": {
+   "file": "theme_bamboo/platform_top2.png",
+   "bundle": "arts\\maps\\map_bambooforest\\res.ab",
+   "texture": "TX_Bambooforest_D",
+   "rect": [
+    390,
+    258,
+    505,
+    372
+   ],
+   "size": [
+    115,
+    114
+   ],
+   "kind": "原作贴图"
+  },
+  "wall_side": {
+   "file": "theme_bamboo/wall_side.png",
+   "bundle": "arts\\maps\\map_bambooforest\\res.ab",
+   "texture": "TX_Bambooforest_D",
+   "rect": [
+    20,
+    640,
+    420,
+    980
+   ],
+   "size": [
+    400,
+    340
+   ],
+   "kind": "原作贴图"
+  },
+  "bg": {
+   "file": "theme_bamboo/bg.png",
+   "bundle": "arts\\maps\\map_bambooforest\\res.ab",
+   "texture": "TX_Bambooforest_BG",
+   "rect": null,
+   "size": [
+    1024,
+    512
+   ],
+   "kind": "原作贴图"
+  }
+ }
+}

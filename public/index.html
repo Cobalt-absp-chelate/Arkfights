@@ -1,0 +1,545 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ArkFights · 罗德岛模拟对战</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="battle-ui.css">
+  <link rel="stylesheet" href="roster.css">
+  <link rel="stylesheet" href="ui-polish.css">
+  <link rel="stylesheet" href="visual-enhancement.css">
+  <link rel="stylesheet" href="hand-ui-enhanced.css">
+  <link rel="stylesheet" href="home-redesign.css">
+  <link rel="stylesheet" href="room-enhanced.css">
+</head>
+<body>
+  <!-- 加载页：仿明日方舟启动 / 神经网络连接 -->
+  <section id="loadingScreen" class="screen loadingScreen">
+    <div class="loadBg"></div>
+    <div class="loadLogo">
+      <div class="logoMark">RI</div>
+      <div class="logoText">
+        <strong>ARKFIGHTS</strong>
+        <span>RHODES ISLAND TACTICAL DUEL SYSTEM</span>
+      </div>
+    </div>
+    <div class="loadStatus">
+      <div class="loadDots"><i></i><i></i><i></i></div>
+      <div id="loadText" class="loadText">正在进行神经网络连接</div>
+      <div class="loadBarFrame"><div id="loadBar" class="loadBar"></div></div>
+      <div class="loadPercent"><span id="loadPercent">0</span>%</div>
+    </div>
+    <div class="loadTip">PRTS // 战术终端 v0.2 · 同人创作，与鹰角网络无关</div>
+  </section>
+
+  <!-- 主页：仿明日方舟主界面布局 -->
+  <section id="homeScreen" class="screen hidden">
+    <header class="akTop">
+      <div class="akPlayer">
+        <div class="akAvatar">Dr.</div>
+        <div>
+          <strong id="playerName">博士</strong>
+          <span>LV. 120 · 职级：Dr.</span>
+        </div>
+      </div>
+      <div class="akCurrency">
+        <span class="chip">◆ 0</span>
+        <span class="chip">≡ 0</span>
+        <span class="chip">◈ 0</span>
+        <div class="akClock" id="homeClock">--:--</div>
+      </div>
+    </header>
+
+    <nav class="akSide">
+      <div class="akSideItem active" id="navTerminal"><b>终端</b><span>TERMINAL</span></div>
+      <div class="akSideItem" id="navRoster"><b>干员</b><span>OPERATORS</span></div>
+      <div class="akSideItem" id="navConfig"><b>设置</b><span>CONFIG</span></div>
+    </nav>
+    <main class="akMain">
+      <!-- 左侧：干员展示区 -->
+      <div class="akHero">
+        <div class="heroArt">
+          <img class="heroChar" src="assets/art/silverash_big.webp" alt="">
+          <div class="heroCharDecor"></div>
+        </div>
+
+        <div class="heroContent">
+          <div class="heroTitle">
+            <div class="heroLogo">
+              <div class="logoIcon">RI</div>
+              <div class="logoText">
+                <strong>ARKFIGHTS</strong>
+                <span>RHODES ISLAND TACTICAL SYSTEM</span>
+              </div>
+            </div>
+            <div class="heroSubtitle">
+              <h2>战术模拟终端</h2>
+              <p>交替选人 · 路线锁定 · 蓝门攻防</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右侧：功能操作区 -->
+      <div class="akMenu">
+        <!-- 配置区 -->
+        <div class="menuConfig">
+          <div class="configGroup">
+            <label>干员代号</label>
+            <input id="nameInput" maxlength="16" value="博士">
+          </div>
+          <div class="configGroup">
+            <label>房间号</label>
+            <input id="roomInput" maxlength="16" value="ark01">
+          </div>
+        </div>
+
+        <!-- 主要操作按钮 -->
+        <button id="quickStartButton" class="menuBtn menuBtnPrimary">
+          <div class="menuBtnIcon">⚔</div>
+          <div class="menuBtnText">
+            <strong>快速开始</strong>
+            <small>QUICK START</small>
+          </div>
+        </button>
+
+        <button id="createRoomButton" class="menuBtn">
+          <div class="menuBtnIcon">+</div>
+          <div class="menuBtnText">
+            <strong>创建房间</strong>
+            <small>CREATE ROOM</small>
+          </div>
+        </button>
+
+        <button id="joinRoomButton" class="menuBtn">
+          <div class="menuBtnIcon">→</div>
+          <div class="menuBtnText">
+            <strong>加入房间</strong>
+            <small>JOIN ROOM</small>
+          </div>
+        </button>
+
+        <button id="copyLinkButton" class="menuBtn">
+          <div class="menuBtnIcon">📋</div>
+          <div class="menuBtnText">
+            <strong>邀请链接</strong>
+            <small>INVITE LINK</small>
+          </div>
+        </button>
+
+        <!-- 分隔线 -->
+        <div class="menuDivider"></div>
+
+        <!-- 次要功能 -->
+        <button id="navRoster" class="menuBtn">
+          <div class="menuBtnIcon">📖</div>
+          <div class="menuBtnText">
+            <strong>干员图鉴</strong>
+            <small>OPERATORS</small>
+          </div>
+        </button>
+
+        <button id="tutStartButton" class="menuBtn">
+          <div class="menuBtnIcon">?</div>
+          <div class="menuBtnText">
+            <strong>新手教程</strong>
+            <small>TUTORIAL</small>
+          </div>
+        </button>
+
+        <button id="guideButton" class="menuBtn">
+          <div class="menuBtnIcon">📄</div>
+          <div class="menuBtnText">
+            <strong>部署教程</strong>
+            <small>GUIDE</small>
+          </div>
+        </button>
+
+        <button id="navConfig" class="menuBtn">
+          <div class="menuBtnIcon">⚙</div>
+          <div class="menuBtnText">
+            <strong>设置</strong>
+            <small>SETTINGS</small>
+          </div>
+        </button>
+
+        <!-- 状态信息 -->
+        <div class="menuDivider"></div>
+        <div style="padding: 8px 0; font-size: 12px; color: var(--ak-gray); letter-spacing: 2px;">
+          <div style="margin-bottom: 6px;">终端状态：<span id="connText" style="color: var(--ak-accent); font-weight: 700;">连接中</span></div>
+          <div id="homeStatus" style="margin-bottom: 6px; color: var(--ak-text);">等待连接作战终端…</div>
+          <div>系统版本：<span style="color: var(--ak-text);">PRTS v0.2</span></div>
+        </div>
+      </div>
+
+      <!-- 底部提示 -->
+      <footer class="akFooter">
+        <span>罗德岛内部演习系统 // 同人创作，与鹰角网络无关</span>
+      </footer>
+    </main>
+  </section>
+
+  <!-- 干员图鉴（应用内切换；window.AKF_ROSTER 渲染） -->
+  <section id="rosterScreen" class="screen hidden rosterScreen">
+    <div class="subTop">
+      <button class="backBtn" id="rosterBack">‹ 返回终端</button>
+      <strong>干员图鉴 <small>OPERATORS</small></strong>
+    </div>
+    <div id="rosterRoot" class="rosterRoot"></div>
+  </section>
+
+  <!-- 设置（应用内切换） -->
+  <section id="configScreen" class="screen hidden configScreen">
+    <div class="subTop">
+      <button class="backBtn" id="configBack">‹ 返回终端</button>
+      <strong>设置 <small>CONFIG</small></strong>
+    </div>
+    <div class="configBody">
+      <label>干员代号 <input id="cfgName" maxlength="16"></label>
+      <label>默认房间号 <input id="cfgRoom" maxlength="16"></label>
+      
+      <label>主页展示干员
+        <select id="cfgHomeOperator">
+          <option value="silverash_big">银灰 (SilverAsh)</option>
+          <option value="exusiai_big">能天使 (Exusiai)</option>
+          <option value="eyjafjalla_big">艾雅法拉 (Eyjafjalla)</option>
+          <option value="mudrock_big">泥岩 (Mudrock)</option>
+          <option value="thorns_big">棘刺 (Thorns)</option>
+          <option value="saria_big">塞雷娅 (Saria)</option>
+          <option value="hoshiguma_big">星熊 (Hoshiguma)</option>
+          <option value="shining_big">闪灵 (Shining)</option>
+          <option value="ifrit_big">伊芙利特 (Ifrit)</option>
+          <option value="siege_big">推进之王 (Siege)</option>
+          <option value="texas_big">德克萨斯 (Texas)</option>
+          <option value="lappland_big">拉普兰德 (Lappland)</option>
+          <option value="ptilopsis_big">白面鸮 (Ptilopsis)</option>
+          <option value="suzuran_big">铃兰 (Suzuran)</option>
+          <option value="amiya_big">阿米娅 (Amiya)</option>
+          <option value="char_010_chen_big">陈 (Ch'en)</option>
+          <option value="char_263_skadi_big">斯卡蒂 (Skadi)</option>
+          <option value="char_148_nearl_big">临光 (Nearl)</option>
+          <option value="char_340_shwaz_big">施瓦茨 (Schwarz)</option>
+          <option value="char_350_surtr_big">史尔特尔 (Surtr)</option>
+          <option value="char_362_saga_big">嵯峨 (Saga)</option>
+          <option value="char_400_weedy_big">温蒂 (Weedy)</option>
+          <option value="char_401_elysm_big">艾丽妮 (Elysium)</option>
+          <option value="char_003_kalts_big">凯尔希 (Kal'tsit)</option>
+          <option value="char_1012_skadi2_big">浊心斯卡蒂 (Skadi Alter)</option>
+          <option value="char_1013_chen2_big">假日陈 (Ch'en Alter)</option>
+          <option value="char_1014_nearl2_big">耀骑士临光 (Nearl Alter)</option>
+          <option value="char_204_platnm_big">白金 (Platinum)</option>
+          <option value="char_213_mostma_big">莫斯提马 (Mostima)</option>
+          <option value="char_250_phatom_big">傀影 (Phantom)</option>
+          <option value="char_2014_nian_big">年 (Nian)</option>
+          <option value="char_2015_dusk_big">夕 (Dusk)</option>
+          <option value="char_2023_ling_big">令 (Ling)</option>
+          <option value="char_206_gnosis_big">诺希斯 (Gnosis)</option>
+          <option value="char_4039_horn_big">号角 (Horn)</option>
+          <option value="char_4064_mlynar_big">玛恩纳 (Mlynar)</option>
+          <option value="char_4009_irene_big">艾蕾妮 (Irene)</option>
+          <option value="char_4087_ines_big">伊内丝 (Ines)</option>
+          <option value="char_4133_logos_big">逻各斯 (Logos)</option>
+          <option value="char_472_pasngr_big">旅客 (Passenger)</option>
+          <option value="char_485_pallas_big">帕拉斯 (Pallas)</option>
+          <option value="char_166_skfire_big">森蚺 (Gavial)</option>
+          <option value="char_108_silent_big">赫默 (Silence)</option>
+          <option value="char_144_red_big">红 (Projekt Red)</option>
+          <option value="char_171_bldsk_big">血染雪 (Blemishine)</option>
+          <option value="kroos_big">克洛丝 (Kroos)</option>
+          <option value="melantha_big">玫兰莎 (Melantha)</option>
+          <option value="myrtle_big">桃金娘 (Myrtle)</option>
+          <option value="cuora_big">蛇屠箱 (Cuora)</option>
+        </select>
+      </label>
+      
+      <label class="cfgRow"><input type="checkbox" id="cfgReduceFx"> 精简特效（低配置）</label>
+      <p class="cfgNote">偏好保存在本机浏览器，不上传。</p>
+    </div>
+  </section>
+
+  <!-- 部署教程（应用内切换；内部滚动、返回键常驻） -->
+  <section id="guideScreen" class="screen hidden guideScreen">
+    <div class="subTop">
+      <button class="backBtn" id="guideBack">‹ 返回终端</button>
+      <strong>部署教程 <small>GUIDE</small></strong>
+    </div>
+    <div class="guideBody" id="guideBody"></div>
+  </section>
+
+  <!-- 地图整图预览（真实地图渲染；可关闭回选择页） -->
+  <div id="mapPreview" class="mapPreview hidden">
+    <div class="mpCard">
+      <div class="mpTop"><b id="mpName">地图预览</b><button id="mpClose" class="backBtn">✕ 关闭</button></div>
+      <canvas id="mpCanvas" width="1100" height="620"></canvas>
+      <div class="mpLegend">
+        <span><i class="lg lgHigh"></i>高台</span>
+        <span><i class="lg lgPath"></i>通路</span>
+        <span><i class="lg lgWall"></i>障碍</span>
+        <span><i class="lg lgBlue"></i>蓝门</span>
+        <span><i class="lg lgRed"></i>红门</span>
+        <span><i class="lg lgDeploy"></i>己方部署区</span>
+      </div>
+      <button id="mpSelect" class="actionStart"><span>选定此图</span><i class="chevrons">»»»</i></button>
+    </div>
+  </div>
+
+  <!-- 房间页 -->
+  <section id="roomScreen" class="screen hidden">
+    <header class="akTop">
+      <div class="akPlayer"><div class="akAvatar">RI</div><div><strong>作战会议室</strong><span id="roomTitle">ROOM // ark01</span></div></div>
+      <div class="akCurrency"><span class="chip">等待其余干员就位</span></div>
+    </header>
+
+    <main class="roomMain">
+      <div class="roomPanel">
+        <h2>出击小队 <small>SQUAD READY</small></h2>
+        <div id="roomPlayers" class="roomPlayers"></div>
+        <div class="buttonRow">
+          <button id="roomReadyButton" class="akBtn"><em>准备</em><small>READY</small></button>
+          <button id="roomStartButton" class="akBtn akBtnMain" disabled><em>开始战斗</em><small>START</small></button>
+          <button id="roomLeaveButton" class="akBtn akBtnGhost"><em>返回主页</em></button>
+        </div>
+        <div id="roomStatus" class="akStatus"></div>
+      </div>
+
+      <aside class="roomAside">
+        <h3>作战地图 <small>BATTLEFIELD</small> <em id="mapCurrent" class="mapCurrent">当前：十字高台 ✓</em></h3>
+        <div class="mapRow mapGrid">
+          <button class="akBtn mapPick" data-map="training"><em>训练场</em><small>TRAINING · 12×8</small><u class="mapCheck">✓ 已选</u></button>
+          <button class="akBtn mapPick" data-map="valley"><em>溪谷</em><small>VALLEY · 24×16</small><u class="mapCheck">✓ 已选</u></button>
+          <button class="akBtn mapPick" data-map="citadel"><em>要塞</em><small>CITADEL · 24×18</small><u class="mapCheck">✓ 已选</u></button>
+          <button class="akBtn mapPick" data-map="basin"><em>天井</em><small>BASIN · 28×20</small><u class="mapCheck">✓ 已选</u></button>
+          <button class="akBtn mapPick" data-map="ridge"><em>山脊</em><small>RIDGE · 32×20</small><u class="mapCheck">✓ 已选</u></button>
+          <button class="akBtn mapPick" data-map="frontier"><em>边境</em><small>FRONTIER · 32×24</small><u class="mapCheck">✓ 已选</u></button>
+        </div>
+        <h3>作战规则 <small>RULES OF ENGAGEMENT</small></h3>
+        <ol>
+          <li>点“开始战斗”后进入<b>交替选人</b>，双方不可选择相同干员。</li>
+          <li>每人从干员池中选择 <b>10 名</b>组成小队。</li>
+          <li>拖卡到己方合法格即部署驻守；选择线路后点“开始行军”或按 <b>Enter</b>，确认后锁定路线。</li>
+          <li><b>R</b> 搬运台上干员；<b>F</b> 选择相邻落点下地。地面远程可拖向己方干员建立跟随。</li>
+          <li>选中己方干员按 <b>E</b> 发动就绪的手动技能；自动和被动技能按自身条件生效。<b>X</b> 主动撤退。</li>
+          <li>对方干员进入己方蓝门扣除门生命，归零即败。</li>
+        </ol>
+      </aside>
+    </main>
+  </section>
+
+  <!-- 选人页（原作编队质感 + 共同选人组织逻辑） -->
+  <section id="draftScreen" class="screen hidden draftScreen">
+    <header class="draftTop">
+      <div class="draftSide blue"><span id="draftBlueName">蓝方</span><small>BLUE TEAM</small></div>
+      <div class="draftPhase">
+        <strong id="draftTurn">轮到你选择干员与技能</strong>
+        <small id="draftCount">蓝 0 : 0 红</small>
+      </div>
+      <div class="draftSide red"><span id="draftRedName">红方</span><small>RED TEAM</small></div>
+    </header>
+
+    <div class="draftBody">
+      <aside class="squadCol">
+        <h3>蓝方阵容 <small>BLUE</small></h3>
+        <div id="draftBluePicks" class="squadSlots"></div>
+      </aside>
+
+      <main class="draftPoolWrap">
+        <div class="poolStatus">
+          <span id="draftHint">点击干员卡预选 · 点击技能图标选择携带技能 · 确认后锁定</span>
+          <div id="draftPrePanel" class="prePanel"><span class="ppEmpty">点击干员卡预选 · 点击技能图标切换携带技能</span></div>
+        </div>
+        <div id="poolBar" class="poolBar">
+          <div id="poolTabs" class="poolTabs">
+            <button class="poolTab on" data-role="all">全部</button>
+            <button class="poolTab" data-role="先锋"><img src="assets/class/pioneer.png" alt="">先锋</button>
+            <button class="poolTab" data-role="近卫"><img src="assets/class/warrior.png" alt="">近卫</button>
+            <button class="poolTab" data-role="重装"><img src="assets/class/tank.png" alt="">重装</button>
+            <button class="poolTab" data-role="狙击"><img src="assets/class/sniper.png" alt="">狙击</button>
+            <button class="poolTab" data-role="术师"><img src="assets/class/caster.png" alt="">术师</button>
+            <button class="poolTab" data-role="医疗"><img src="assets/class/medic.png" alt="">医疗</button>
+            <button class="poolTab" data-role="辅助"><img src="assets/class/support.png" alt="">辅助</button>
+            <button class="poolTab" data-role="特种"><img src="assets/class/special.png" alt="">特种</button>
+          </div>
+          <input id="poolSearch" class="poolSearch" type="search" placeholder="搜索干员名…" autocomplete="off">
+        </div>
+        <div id="draftRoster" class="draftRoster"></div>
+      </main>
+
+      <aside class="squadCol">
+        <h3>红方阵容 <small>RED</small></h3>
+        <div id="draftRedPicks" class="squadSlots"></div>
+      </aside>
+    </div>
+
+    <footer class="draftAction">
+      <div class="draftCap">编队上限 <b id="draftCap">0/8</b></div>
+      <button id="draftConfirmButton" class="actionStart" disabled>
+        <span id="draftActionLabel">等待选择</span>
+        <i class="chevrons">»»»</i>
+      </button>
+    </footer>
+  </section>
+
+  <!-- 战斗页 -->
+<!-- 战斗界面参考片段：全屏战场 + 底部部署卡 + 原作式选中叠层 -->
+<section id="battleScreen" class="screen hidden battleScreen">
+  <!-- 顶栏：设置 / 蓝门生命 / 计时 / 费用 -->
+  <header class="btTop">
+    <button class="btGear" id="battleSettingsButton" title="战斗视角与操作" aria-expanded="false">⚙</button>
+    <div class="btCounters">
+      <div class="btEnemy"><span class="btEnemyIcon">◎</span><small>ENEMY</small><b id="enemyHp">12</b></div>
+      <div class="btGate"><span class="btGateIcon">♜</span><b id="blueHp">12</b></div>
+      <div class="btClock"><b id="timer">00:00</b></div>
+    </div>
+    <div class="btTeam" id="teamBadge">阵营：随机分配</div>
+  </header>
+
+  <aside id="battleSettingsPanel" class="btGearPanel hidden" aria-label="战斗视角与操作">
+    <strong>战斗视角</strong>
+    <div class="btViewOptions">
+      <button type="button" data-view="default">默认</button>
+      <button type="button" data-view="top">俯视</button>
+      <button type="button" data-view="angled">斜视</button>
+    </div>
+    <button type="button" id="resetBattleView">视野回中</button>
+    <p>拖动部署卡落地，选中干员后选择线路。Enter 开始行军。</p>
+    <p>E 技能 · R 高台搬运 · F 下地 · X 撤退 · Esc 取消选择</p>
+    <button type="button" id="closeBattleSettings">关闭</button>
+  </aside>
+
+  <!-- 战场：全屏，无左右常驻栏 -->
+  <div class="btBoard">
+    <div class="boardStack">
+      <canvas id="battleCanvas" width="960" height="640" tabindex="0" aria-label="战场地图"></canvas>
+      <canvas id="unitCanvas" width="960" height="640"></canvas>
+      <canvas id="occCanvas" width="960" height="640"></canvas>
+      <canvas id="fxCanvas" width="960" height="640"></canvas>
+      <canvas id="animCanvas" width="960" height="640"></canvas>
+      <canvas id="routeCanvas" width="960" height="640"></canvas>
+    </div>
+    <!-- 小地图（仅大图显示；地形/门/阵营/单位/视野框；单击定位、拖框平移） -->
+    <div id="miniWrap" class="miniWrap hidden">
+      <canvas id="miniMap" width="220" height="150"></canvas>
+      <div class="miniTip">单击定位 · 拖框平移</div>
+    </div>
+  </div>
+
+  <!-- 四向朝向选择（部署/选中未确认单位时出现；世界不暂停、不遮挡战场） -->
+  <div id="facingPicker" class="facingPicker hidden" role="group" aria-label="选择朝向">
+    <button type="button" class="fpDir fpUp" data-dir="up" title="朝上（↑）">▲</button>
+    <button type="button" class="fpDir fpLeft" data-dir="left" title="朝左（←）">◀</button>
+    <button type="button" class="fpDir fpConfirm" id="facingConfirm" title="确认（Enter）">✓</button>
+    <button type="button" class="fpDir fpRight" data-dir="right" title="朝右（→）">▶</button>
+    <button type="button" class="fpDir fpDown" data-dir="down" title="朝下（↓）">▼</button>
+    <span id="facingPickLabel" class="fpLabel">朝向：下</span>
+  </div>
+  <div id="facingHint" class="facingHint hidden">选择朝向后开始输出</div>
+
+  <!-- 线路条（线路制：无上路/下路按钮 —— ↑/↓ 切换候选线路、Enter 出发；线路名常显 + 快捷键提示） -->
+  <div id="routeBar" class="routeBar">
+    <span class="rbLabel">进攻线路</span>
+    <div id="routeLines" class="routeLines"></div>
+    <button id="routeModeBtn" class="rbBtn" type="button">高级模式 H：关</button>
+    <button id="marchButton" class="rbBtn hidden" type="button">开始行军 · Enter</button>
+    <div id="routeHint" class="rbHint">↑/↓ 切换线路 · Enter 出发 · 空格 自动寻路 · H 高级模式 · G 清空路线</div>
+    <div id="followBadge" class="rbFollow"></div>
+    <button id="followClearBtn" class="rbBtn hidden" type="button">解除跟随</button>
+  </div>
+
+  <!-- 底部部署卡（原作样式：头像、费用、职业、再部署倒计时）+ 右下费用 -->
+  <footer class="btHand">
+    <div class="btSide">
+      <div class="btCost"><span class="btCostIcon">◈</span><b id="cost">10</b></div>
+      <div class="btSlots">剩余可放置角色：<b id="deploySlots">0</b></div>
+    </div>
+    <div id="hand" class="hand"></div>
+  </footer>
+
+  <!-- 选中干员叠层（原作式：立绘 + 属性 + 攻击范围 + 技能卡） -->
+  <aside id="unitOverlay" class="unitOverlay hidden">
+    <button class="uoClose" id="unitOverlayClose">✕</button>
+    <div class="uoLeft">
+      <img id="uoArt" alt="干员立绘">
+      <div class="uoName"><b id="uoName">干员</b><span id="uoLevel">LV.80</span></div>
+      <div class="uoStats">
+        <span>攻击 <b id="uoAtk">0</b></span>
+        <span>防御 <b id="uoDef">0</b></span>
+        <span>法抗 <b id="uoRes">0</b></span>
+        <span>阻挡 <b id="uoBlock">0</b></span>
+      </div>
+      <div class="uoRange">
+        <div class="uoRangeTitle">攻击范围</div>
+        <canvas id="uoRangeCanvas" width="120" height="120"></canvas>
+      </div>
+      <div class="uoHealth"><span>生命</span><b id="uoHp">0/0</b></div>
+      <div class="uoSp"><span>技力 <b id="uoSpValue">0/0</b></span><div class="uoSpTrack"><i id="uoSpFill" class="uoSpFill"></i></div></div>
+    </div>
+    <div class="uoTabs">
+      <button class="uoTab active" data-tab="skill">技能</button>
+      <button class="uoTab" data-tab="trait">特性</button>
+      <button class="uoTab" data-tab="talent">天赋</button>
+    </div>
+    <div class="uoSkill">
+      <div class="uoSkillIcon" id="uoSkillIcon">❄</div>
+      <div class="uoSkillBody">
+        <b id="uoSkillName">技能名</b>
+        <div class="uoSkillTags">
+          <span class="tagAuto" id="uoSpType">自动回复</span>
+          <span class="tagManual" id="uoTriggerType">手动触发</span>
+          <span class="tagTime" id="uoSkillTime">20秒</span>
+        </div>
+        <p id="uoSkillDesc">技能描述</p>
+      </div>
+      <button id="uoSkillButton" class="uoSkillButton"><b>E</b><span id="uoSkillState">READY</span></button>
+    </div>
+  </aside>
+
+  <!-- 浮层：高台搬运/下地行动/主动撤退（游戏机制按钮；无返回/倍速/暂停） -->
+  <div class="btFloat">
+    <button id="highMoveButton" class="btFloatBtn">R · 高台搬运</button>
+    <button id="descendButton" class="btFloatBtn">F · 下地行动</button>
+    <button id="retreatButton" class="btFloatBtn danger">X · 主动撤退</button>
+    <div id="unitModeBadge" class="btModeBadge"></div>
+  </div>
+  <div id="tutPanel" class="tutPanel hidden"></div>
+  <div id="followTip" class="followTip hidden"></div>
+  <div id="toastArea" class="toastArea"></div>
+  <div id="log" class="hidden"></div>
+
+  <!-- 结算覆盖层 -->
+  <div id="resultOverlay" class="resultOverlay hidden">
+    <div id="resultCard" class="resultCard win">
+      <h2 id="resultTitle">OPERATION SUCCESS</h2>
+      <p id="resultSub">敌方蓝门攻破 · 作战胜利</p>
+      <div class="resultStats">
+        <div><b id="resultTime">00:00</b><small>作战时长</small></div>
+        <div><b id="resultBlueHp">0</b><small>蓝门剩余</small></div>
+        <div><b id="resultRedHp">0</b><small>红门剩余</small></div>
+      </div>
+      <div class="buttonRow">
+        <button id="resultRestart" class="akBtn akBtnMain"><em>再开一局</em><small>REMATCH</small></button>
+        <button id="resultHome" class="akBtn"><em>返回主页</em><small>HOME</small></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+  <script src="data.js"></script>
+  <script src="maps.js"></script>
+  <script src="projection.js"></script>
+  <script src="map-themes.js"></script>
+  <script src="summons-config.js"></script>
+  <script src="sim.js"></script>
+  <script src="vendor/pixi.min.js"></script>
+  <script src="vendor/pixi-spine.js"></script>
+  <script src="vendor/spine-runtime-3.8.js"></script>
+  <script src="map-animations.js"></script>
+  <script src="unit-animations.js"></script>
+  <script src="tutorial.js"></script>
+  <script src="skill-controls.js"></script>
+  <script src="app.js"></script>
+  <script src="fps-monitor.js"></script>
+  <script src="roster.js"></script>
+  <script src="ui-anim.js"></script>
+</body>
+</html>

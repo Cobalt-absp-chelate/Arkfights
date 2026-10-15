@@ -1,0 +1,101 @@
+{
+ "id": "smelter",
+ "label": "锈蚀工业（熔炼场/要塞）",
+ "maps": [
+  "citadel"
+ ],
+ "note": "TX_Smelter_D 为 2048 图集：混凝土板/金属台板/警示涂装/墙面；BG 为熔炼厂远景。",
+ "slots": {
+  "ground_top": {
+   "file": "theme_smelter/ground_top.png",
+   "bundle": "arts\\maps\\map_smelter\\res.ab",
+   "texture": "TX_Smelter_D",
+   "rect": [
+    20,
+    490,
+    470,
+    850
+   ],
+   "size": [
+    450,
+    360
+   ],
+   "kind": "原作贴图"
+  },
+  "ground_top2": {
+   "file": "theme_smelter/ground_top2.png",
+   "bundle": "arts\\maps\\map_smelter\\res.ab",
+   "texture": "TX_Smelter_D",
+   "rect": [
+    1300,
+    1500,
+    2020,
+    2020
+   ],
+   "size": [
+    720,
+    520
+   ],
+   "kind": "原作贴图"
+  },
+  "platform_top": {
+   "file": "theme_smelter/platform_top.png",
+   "bundle": "arts\\maps\\map_smelter\\res.ab",
+   "texture": "TX_Smelter_D",
+   "rect": [
+    470,
+    10,
+    1540,
+    310
+   ],
+   "size": [
+    1070,
+    300
+   ],
+   "kind": "原作贴图"
+  },
+  "platform_top2": {
+   "file": "theme_smelter/platform_top2.png",
+   "bundle": "arts\\maps\\map_smelter\\res.ab",
+   "texture": "TX_Smelter_D",
+   "rect": [
+    20,
+    10,
+    470,
+    470
+   ],
+   "size": [
+    450,
+    460
+   ],
+   "kind": "原作贴图"
+  },
+  "wall_side": {
+   "file": "theme_smelter/wall_side.png",
+   "bundle": "arts\\maps\\map_smelter\\res.ab",
+   "texture": "TX_Smelter_D",
+   "rect": [
+    1540,
+    850,
+    2030,
+    1240
+   ],
+   "size": [
+    490,
+    390
+   ],
+   "kind": "原作贴图"
+  },
+  "bg": {
+   "file": "theme_smelter/bg.png",
+   "bundle": "arts\\maps\\map_smelter\\res.ab",
+   "texture": "TX_Smelter_BG",
+   "rect": null,
+   "size": [
+    1024,
+    512
+   ],
+   "kind": "原作贴图"
+  }
+ }
+}

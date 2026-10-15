@@ -1,0 +1,40 @@
+{
+ "id": "battleground",
+ "label": "工业灰（原作战斗场）",
+ "maps": [
+  "training"
+ ],
+ "note": "map_battleground/res.ab 的既有提取物即本主题（训练场沿用原作战斗场材质）。",
+ "slots": {
+  "ground_top": {
+   "file": null,
+   "fallback": "tile_ground_top",
+   "kind": "回退"
+  },
+  "ground_top2": {
+   "file": null,
+   "fallback": "tile_ground_top2",
+   "kind": "回退"
+  },
+  "platform_top": {
+   "file": null,
+   "fallback": "tile_platform_top",
+   "kind": "回退"
+  },
+  "platform_top2": {
+   "file": null,
+   "fallback": "tile_platform_top2",
+   "kind": "回退"
+  },
+  "wall_side": {
+   "file": null,
+   "fallback": "tile_wall_side",
+   "kind": "回退"
+  },
+  "bg": {
+   "file": null,
+   "fallback": "TX_Battleground_BG",
+   "kind": "回退"
+  }
+ }
+}

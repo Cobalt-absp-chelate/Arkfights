@@ -1,0 +1,12 @@
+{
+  "name": "arkfights",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ArkFights —— 明日方舟风格局域网双人对战（同人作品，与鹰角网络无关）",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

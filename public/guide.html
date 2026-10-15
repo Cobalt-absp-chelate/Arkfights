@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ArkFights · 部署教程</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .guide { width: min(980px, 92vw); margin: 28px auto; padding: 28px; background: rgba(255,255,255,.94); border: 2px solid #232323; }
+    .guide h1 { margin-bottom: 6px; }
+    .guide h2 { margin-top: 26px; color: #232323; }
+    .guide ol, .guide ul { line-height: 2; color: #4c4c4c; }
+    .guide b { background: #ffd800; padding: 0 4px; }
+    .keys { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 12px; }
+    .keys div { padding: 10px 12px; background: #e3e3e3; border-left: 4px solid #e8b400; }
+  </style>
+</head>
+<body>
+  <main class="guide">
+    <h1>部署教程 · 模拟战入门</h1>
+    <p class="muted">ArkFights 是局域网双人对战：你的干员要突破对方蓝门，同时守住自己的蓝门。</p>
+
+    <h2>一、流程</h2>
+    <ol>
+      <li>主页输入干员代号与房间号 → <b>创建/加入房间</b>。</li>
+      <li>房主点<b>开始战斗</b> → 进入<b>服务器交替选人</b>：轮流选干员并点选其携带技能（双方不能重复干员）。</li>
+      <li>选满 8 人自动进入战场。<b>蓝/红阵营每局随机分配</b>，看顶部颜色与地图着色。</li>
+    </ol>
+
+    <h2>二、部署与路线</h2>
+    <ol>
+      <li>底部选择干员（<b>1-0 Q W</b> 或点击卡片），只能部署在<b>己方半场</b>。</li>
+      <li>点击部署格 → 移动鼠标<b>绘制路线</b>（黄色高亮）→ <b>Enter</b> 确认；确认后路线锁定，施法结束后继续原路线。</li>
+      <li>地面干员不能穿高台（高台通路除外）；高台干员不自行移动，用 <b>R</b> 搬运（冷却 12 秒）。</li>
+    </ol>
+
+    <h2>三、战斗规则</h2>
+    <ul>
+      <li>攻击：物理伤害=攻击力−防御；法术吃法抗；最终伤害统一 ×0.5（只作用伤害，治疗保持原值）。</li>
+      <li>阻挡：地面单位按阻挡数拦截相邻敌人；被阻挡的干员停步交战。</li>
+      <li>技能：<b>E</b> 或点技能按钮；按原作技力（自动/攻击回复）充能；施法期间停止移动、持续输出照常。</li>
+      <li>突破：干员抵达对方蓝门扣除门生命（重装 2、其余战斗干员 1、医疗/辅助 0）；门生命归零判负。</li>
+    </ul>
+
+    <h2>四、快捷键</h2>
+    <div class="keys">
+      <div><b>1-0 Q W</b> 选择干员</div>
+      <div><b>Enter</b> 确认路线</div>
+      <div><b>E</b> 释放技能</div>
+      <div><b>R</b> 高台搬运</div>
+      <div><b>Esc</b> 取消当前操作</div>
+      <div><b>点击</b> 部署 / 选中干员</div>
+    </div>
+
+    <p style="margin-top:26px"><a href="index.html">← 返回主页</a></p>
+  </main>
+</body>
+</html>

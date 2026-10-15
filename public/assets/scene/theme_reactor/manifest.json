@@ -1,0 +1,101 @@
+{
+ "id": "reactor",
+ "label": "晶石暗金属（反应堆/天井）",
+ "maps": [
+  "basin"
+ ],
+ "note": "TX_Reactor_D：暗色金属板/锈板/绿色台板/电路纹墙块；BG 为反应堆远景。",
+ "slots": {
+  "ground_top": {
+   "file": "theme_reactor/ground_top.png",
+   "bundle": "arts\\maps\\map_reactor\\res.ab",
+   "texture": "TX_Reactor_D",
+   "rect": [
+    640,
+    660,
+    1000,
+    1010
+   ],
+   "size": [
+    360,
+    350
+   ],
+   "kind": "原作贴图"
+  },
+  "ground_top2": {
+   "file": "theme_reactor/ground_top2.png",
+   "bundle": "arts\\maps\\map_reactor\\res.ab",
+   "texture": "TX_Reactor_D",
+   "rect": [
+    10,
+    310,
+    185,
+    495
+   ],
+   "size": [
+    175,
+    185
+   ],
+   "kind": "原作贴图"
+  },
+  "platform_top": {
+   "file": "theme_reactor/platform_top.png",
+   "bundle": "arts\\maps\\map_reactor\\res.ab",
+   "texture": "TX_Reactor_D",
+   "rect": [
+    690,
+    15,
+    1010,
+    345
+   ],
+   "size": [
+    320,
+    330
+   ],
+   "kind": "原作贴图"
+  },
+  "platform_top2": {
+   "file": "theme_reactor/platform_top2.png",
+   "bundle": "arts\\maps\\map_reactor\\res.ab",
+   "texture": "TX_Reactor_D",
+   "rect": [
+    15,
+    15,
+    350,
+    295
+   ],
+   "size": [
+    335,
+    280
+   ],
+   "kind": "原作贴图"
+  },
+  "wall_side": {
+   "file": "theme_reactor/wall_side.png",
+   "bundle": "arts\\maps\\map_reactor\\res.ab",
+   "texture": "TX_Reactor_D",
+   "rect": [
+    15,
+    530,
+    300,
+    1010
+   ],
+   "size": [
+    285,
+    480
+   ],
+   "kind": "原作贴图"
+  },
+  "bg": {
+   "file": "theme_reactor/bg.png",
+   "bundle": "arts\\maps\\map_reactor\\res.ab",
+   "texture": "TX_Reactor_BG",
+   "rect": null,
+   "size": [
+    1024,
+    512
+   ],
+   "kind": "原作贴图"
+  }
+ }
+}

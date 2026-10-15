@@ -1,0 +1,577 @@
+/* 
+ * ArkFights - Room Interface Deep Visual Enhancement
+ * 房间界面深度视觉优化 - 达到明日方舟级别的视觉品质
+ */
+
+/* ========================================
+   地图选择区域 - 卡片化设计
+   ======================================== */
+
+/* 地图网格容器优化 */
+.mapGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 18px;
+  perspective: 1000px; /* 3D透视效果 */
+}
+
+/* 地图卡片基础样式 - 卡片化设计 */
+.mapPick {
+  position: relative;
+  padding: 16px 14px;
+  background: linear-gradient(135deg, rgba(40,45,60,0.9), rgba(30,35,50,0.95));
+  border: 2px solid rgba(100,110,130,0.4);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  transform-style: preserve-3d;
+  box-shadow: 0 4px 8px rgba(0,0,0,.25);
+}
+
+/* 卡片装饰性背景纹理 */
+.mapPick::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 80px;
+  height: 80px;
+  background: 
+    linear-gradient(135deg, transparent 30%, rgba(255,216,0,0.05) 100%);
+  clip-path: polygon(100% 0, 100% 100%, 0 0);
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+
+/* 悬停效果 - 上浮+发光 */
+.mapPick:hover {
+  transform: translateY(-4px) scale(1.02);
+  border-color: var(--ak-accent);
+  box-shadow: 
+    0 8px 24px rgba(255,216,0,0.2),
+    0 0 0 1px rgba(255,216,0,0.3),
+    inset 0 1px 0 rgba(255,255,255,0.1);
+  background: linear-gradient(135deg, rgba(45,50,65,0.95), rgba(35,40,55,1));
+}
+
+.mapPick:hover::before {
+  opacity: 1.5;
+}
+
+/* 选中状态 - 明显标识 */
+.mapPick.active {
+  border: 2px solid var(--ak-accent);
+  background: linear-gradient(135deg, rgba(50,55,70,0.95), rgba(40,45,60,1));
+  box-shadow: 
+    0 8px 28px rgba(255,216,0,0.35),
+    0 0 0 2px rgba(255,216,0,0.25),
+    inset 0 0 40px rgba(255,216,0,0.08);
+  transform: translateY(-2px);
+}
+
+/* 选中标记 - ✓图标 */
+.mapPick.active::after {
+  content: '✓';
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 28px;
+  height: 28px;
+  background: var(--ak-accent);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #000;
+  font-weight: bold;
+  font-size: 16px;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(255,216,0,0.5);
+  animation: checkmarkPop 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes checkmarkPop {
+  0% {
+    transform: scale(0) rotate(-180deg);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.15) rotate(10deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+/* 地图名称样式优化 */
+.mapPick em {
+  display: block;
+  font-style: normal;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: var(--ak-text);
+  margin-bottom: 8px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  position: relative;
+  z-index: 2;
+}
+
+/* 地图尺寸标签 */
+.mapPick small {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: rgba(150,180,220,0.9);
+  letter-spacing: 2px;
+  position: relative;
+  z-index: 2;
+}
+
+/* 为地图尺寸添加独立的badge样式 */
+.mapPick small::before {
+  content: '◆';
+  color: rgba(100,150,200,0.6);
+  font-size: 10px;
+  margin-right: 2px;
+}
+
+/* 地图难度星级（如果HTML中有的话） */
+.mapDifficulty {
+  position: absolute;
+  bottom: 10px;
+  left: 14px;
+  color: #ffd800;
+  font-size: 14px;
+  letter-spacing: 2px;
+  z-index: 2;
+}
+
+/* 原有的mapCheck标记优化（与新的✓图标共存） */
+.mapPick .mapCheck {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  font-size: 12px;
+  color: var(--ak-accent);
+  text-decoration: none;
+  visibility: hidden;
+  z-index: 1;
+}
+
+.mapPick.active .mapCheck {
+  visibility: visible;
+}
+
+/* 地图卡片入场动画 */
+.mapPick {
+  animation: mapCardEnter 0.4s ease both;
+}
+
+.mapGrid .mapPick:nth-child(1) { animation-delay: 0.05s; }
+.mapGrid .mapPick:nth-child(2) { animation-delay: 0.10s; }
+.mapGrid .mapPick:nth-child(3) { animation-delay: 0.15s; }
+.mapGrid .mapPick:nth-child(4) { animation-delay: 0.20s; }
+.mapGrid .mapPick:nth-child(5) { animation-delay: 0.25s; }
+.mapGrid .mapPick:nth-child(6) { animation-delay: 0.30s; }
+
+@keyframes mapCardEnter {
+  from {
+    opacity: 0;
+    transform: translateX(20px) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) translateY(0);
+  }
+}
+
+/* ========================================
+   按钮组优化
+   ======================================== */
+
+/* 主按钮（开始战斗、确认阵容） */
+.akBtnMain,
+#roomStartButton.akBtn.akBtnMain,
+#draftConfirmButton.actionStart {
+  position: relative;
+  background: linear-gradient(135deg, #ffd800, #ffaa00);
+  color: #1a1d22;
+  font-weight: bold;
+  border: none;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(255,216,0,0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 主按钮光波动画 */
+.akBtnMain::before,
+#roomStartButton.akBtn.akBtnMain::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255,255,255,0.3);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+  pointer-events: none;
+}
+
+.akBtnMain:hover::before,
+#roomStartButton.akBtn.akBtnMain:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.akBtnMain:hover,
+#roomStartButton.akBtn.akBtnMain:hover {
+  transform: skewX(var(--skew)) translateY(-2px);
+  box-shadow: 
+    0 6px 20px rgba(255,216,0,0.4),
+    0 0 30px rgba(255,216,0,0.2);
+  filter: brightness(1.1);
+}
+
+.akBtnMain:active,
+#roomStartButton.akBtn.akBtnMain:active {
+  transform: skewX(var(--skew)) translateY(1px);
+}
+
+/* 准备按钮 */
+#roomReadyButton.akBtn {
+  background: linear-gradient(135deg, rgba(74,168,255,0.9), rgba(60,140,220,0.95));
+  color: #fff;
+  border: 2px solid rgba(74,168,255,0.5);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(74,168,255,0.25);
+}
+
+#roomReadyButton.akBtn:hover {
+  background: linear-gradient(135deg, rgba(84,178,255,1), rgba(70,150,230,1));
+  border-color: rgba(74,168,255,0.8);
+  box-shadow: 
+    0 6px 18px rgba(74,168,255,0.35),
+    0 0 20px rgba(74,168,255,0.15);
+}
+
+/* 次要按钮优化 */
+.akBtn,
+.akBtnGhost {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.akBtn:hover {
+  transform: skewX(var(--skew)) translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+/* 禁用状态优化 */
+.akBtn:disabled,
+.akBtnMain:disabled,
+#roomStartButton.akBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  filter: grayscale(0.6);
+  transform: skewX(var(--skew));
+  box-shadow: none;
+}
+
+.akBtn:disabled:hover {
+  transform: skewX(var(--skew));
+  box-shadow: none;
+}
+
+/* ========================================
+   作战规则区域优化
+   ======================================== */
+
+/* 规则列表优化 */
+.roomAside ol {
+  padding-left: 0;
+  list-style: none;
+  line-height: 2.2;
+  color: var(--ak-text-2);
+  font-size: 14px;
+  counter-reset: rule-counter;
+}
+
+.roomAside ol li {
+  position: relative;
+  padding-left: 32px;
+  margin-bottom: 10px;
+  counter-increment: rule-counter;
+  transition: all 0.2s;
+}
+
+/* 规则序号 */
+.roomAside ol li::before {
+  content: counter(rule-counter);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 24px;
+  height: 24px;
+  background: rgba(255,216,0,0.15);
+  border: 1px solid rgba(255,216,0,0.4);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ak-accent);
+  font-weight: bold;
+  font-size: 12px;
+}
+
+/* 规则项悬停效果 */
+.roomAside ol li:hover {
+  color: var(--ak-text);
+  padding-left: 36px;
+}
+
+.roomAside ol li:hover::before {
+  background: rgba(255,216,0,0.25);
+  border-color: var(--ak-accent);
+  box-shadow: 0 0 8px rgba(255,216,0,0.3);
+}
+
+/* 关键数字和按键高亮 */
+.roomAside ol li b {
+  display: inline-block;
+  background: rgba(255,216,0,0.15);
+  color: var(--ak-accent);
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-weight: bold;
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 13px;
+  margin: 0 2px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  border: 1px solid rgba(255,216,0,0.3);
+}
+
+/* ========================================
+   房间标题和状态区域优化
+   ======================================== */
+
+/* 房间面板标题 */
+.roomPanel h2,
+.roomAside h3 {
+  position: relative;
+  padding-left: 14px;
+  border-left: 4px solid var(--ak-accent);
+  margin-bottom: 20px;
+  letter-spacing: 4px;
+  font-size: 22px;
+  color: var(--ak-text);
+}
+
+.roomPanel h2::after,
+.roomAside h3::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--ak-accent), transparent);
+}
+
+/* 玩家卡片优化 */
+.roomPlayer {
+  position: relative;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, rgba(30,35,42,0.85), rgba(25,30,37,0.9));
+  border-left: 5px solid var(--ak-blue);
+  border-radius: 0 4px 4px 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  overflow: hidden;
+}
+
+/* 玩家卡片装饰背景 */
+.roomPlayer::before {
+  content: '';
+  position: absolute;
+  right: -20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 80px;
+  height: 80px;
+  background: radial-gradient(circle, rgba(74,168,255,0.1), transparent 60%);
+  border-radius: 50%;
+  transition: all 0.3s;
+}
+
+.roomPlayer.red::before {
+  background: radial-gradient(circle, rgba(255,91,74,0.1), transparent 60%);
+}
+
+.roomPlayer:hover {
+  background: linear-gradient(135deg, rgba(35,40,47,0.95), rgba(30,35,42,1));
+  transform: translateX(4px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+}
+
+.roomPlayer:hover::before {
+  transform: translateY(-50%) scale(1.3);
+  opacity: 1.5;
+}
+
+/* 玩家名称强调 */
+.roomPlayer strong {
+  font-size: 16px;
+  letter-spacing: 2px;
+  color: var(--ak-text);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+/* ========================================
+   响应式优化
+   ======================================== */
+
+@media (max-width: 1400px) {
+  .mapPick {
+    padding: 12px 10px;
+  }
+  
+  .mapPick em {
+    font-size: 18px;
+  }
+  
+  .mapPick small {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .mapGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+}
+
+@media (max-width: 900px) {
+  .mapGrid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+
+/* ========================================
+   地图当前选择标签优化
+   ======================================== */
+
+.mapCurrent {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 12px;
+  padding: 4px 12px;
+  background: rgba(255,216,0,0.15);
+  border: 1px solid rgba(255,216,0,0.4);
+  border-radius: 4px;
+  color: var(--ak-accent);
+  font-size: 13px;
+  letter-spacing: 2px;
+  font-style: normal;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(255,216,0,0.15);
+}
+
+.mapCurrent::before {
+  content: '✓';
+  font-size: 12px;
+  font-weight: bold;
+}
+
+/* ========================================
+   按钮行优化
+   ======================================== */
+
+.buttonRow {
+  display: flex;
+  gap: 14px;
+  margin-top: 24px;
+}
+
+.buttonRow .akBtn {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ========================================
+   房间状态文字优化
+   ======================================== */
+
+#roomStatus.akStatus {
+  padding: 12px 16px;
+  background: rgba(255,216,0,0.08);
+  border-left: 3px solid var(--ak-accent);
+  margin-top: 16px;
+  color: var(--ak-text-2);
+  font-size: 13px;
+  letter-spacing: 2px;
+  border-radius: 0 4px 4px 0;
+}
+
+/* ========================================
+   微动画和交互反馈
+   ======================================== */
+
+/* 脉冲动画 - 用于准备状态等 */
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(255,216,0,0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(255,216,0,0);
+  }
+}
+
+/* 为准备完成的玩家添加脉冲效果 */
+.roomPlayer.ready {
+  animation: pulse 2s infinite;
+}
+
+/* 闪烁动画 - 用于等待状态 */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* 标签闪烁 */
+.roomPlayer .tag.waiting {
+  animation: blink 1.5s ease-in-out infinite;
+}
+
+/* ========================================
+   滚动条美化
+   ======================================== */
+
+.roomAside ol::-webkit-scrollbar {
+  width: 8px;
+}
+
+.roomAside ol::-webkit-scrollbar-track {
+  background: rgba(255,255,255,0.05);
+  border-radius: 4px;
+}
+
+.roomAside ol::-webkit-scrollbar-thumb {
+  background: rgba(255,216,0,0.3);
+  border-radius: 4px;
+  transition: background 0.3s;
+}
+
+.roomAside ol::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,216,0,0.5);
+}

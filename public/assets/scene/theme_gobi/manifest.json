@@ -1,0 +1,101 @@
+{
+ "id": "gobi",
+ "label": "荒漠砂岩（戈壁/边境）",
+ "maps": [
+  "frontier"
+ ],
+ "note": "沙面取自 map_gobi/TX_Gobi_A（纯沙丘）；砂岩台面/岩壁取自 map_desert_city/TX_Desert_A。",
+ "slots": {
+  "ground_top": {
+   "file": "theme_gobi/ground_top.png",
+   "bundle": "arts\\maps\\map_gobi\\res.ab",
+   "texture": "TX_Gobi_A",
+   "rect": [
+    100,
+    100,
+    420,
+    420
+   ],
+   "size": [
+    320,
+    320
+   ],
+   "kind": "原作贴图"
+  },
+  "ground_top2": {
+   "file": "theme_gobi/ground_top2.png",
+   "bundle": "arts\\maps\\map_gobi\\res.ab",
+   "texture": "TX_Gobi_A",
+   "rect": [
+    520,
+    320,
+    840,
+    640
+   ],
+   "size": [
+    320,
+    320
+   ],
+   "kind": "原作贴图"
+  },
+  "platform_top": {
+   "file": "theme_gobi/platform_top.png",
+   "bundle": "arts\\maps\\map_desert_city\\res.ab",
+   "texture": "TX_Desert_A",
+   "rect": [
+    462,
+    272,
+    632,
+    385
+   ],
+   "size": [
+    170,
+    113
+   ],
+   "kind": "原作贴图"
+  },
+  "platform_top2": {
+   "file": "theme_gobi/platform_top2.png",
+   "bundle": "arts\\maps\\map_desert_city\\res.ab",
+   "texture": "TX_Desert_A",
+   "rect": [
+    14,
+    180,
+    112,
+    264
+   ],
+   "size": [
+    90,
+    84
+   ],
+   "kind": "原作贴图"
+  },
+  "wall_side": {
+   "file": "theme_gobi/wall_side.png",
+   "bundle": "arts\\maps\\map_desert_city\\res.ab",
+   "texture": "TX_Desert_A",
+   "rect": [
+    295,
+    278,
+    448,
+    448
+   ],
+   "size": [
+    153,
+    170
+   ],
+   "kind": "原作贴图"
+  },
+  "bg": {
+   "file": "theme_gobi/bg.png",
+   "bundle": "arts\\maps\\map_gobi\\res.ab",
+   "texture": "TX_Gobi_BG",
+   "rect": null,
+   "size": [
+    512,
+    512
+   ],
+   "kind": "原作贴图"
+  }
+ }
+}

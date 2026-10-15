@@ -1,0 +1,818 @@
+/* ==========================================================================
+   ArkFights · UI 打磨层（ui-polish.css）
+   在 styles.css / battle-ui.css 之后加载：统一《明日方舟》终端质感 ——
+   冷灰底色 + 明黄强调、半透明深色玻璃面板、斜切卡片、黄黑警示条纹点缀、
+   细描边与克制的高光。只做视觉，不改任何结构 / 命名 / 交互。
+   ========================================================================== */
+
+:root {
+  /* 冷灰 + 明黄 */
+  --ak-bg: #14171c;
+  --ak-bg-2: #0e1116;
+  --ak-panel: #1a1f26;
+  --ak-panel-2: #222932;
+  --ak-line: rgba(255, 255, 255, .12);
+  --ak-line-dark: rgba(255, 255, 255, .26);
+  --ak-text: #e9edf3;
+  --ak-text-2: #aeb7c2;
+  --ak-gray: #7d8794;
+  --ak-accent: #ffd800;
+  --ak-accent-deep: #c9a227;
+  --ak-blue: #4aa8ff;
+  --ak-red: #ff5b4a;
+  --ak-green: #57c98a;
+
+  /* 玻璃 / 描边 / 条纹 */
+  --ak-glass: rgba(18, 22, 28, .62);
+  --ak-glass-2: rgba(22, 27, 34, .86);
+  --ak-glass-3: rgba(12, 15, 20, .9);
+  --ak-stroke: rgba(255, 255, 255, .10);
+  --ak-stroke-2: rgba(255, 255, 255, .22);
+  --ak-hazard: repeating-linear-gradient(-45deg, #ffd800 0 9px, #14171c 9px 18px);
+  --ak-cut: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+  --ak-cut-s: polygon(0 0, calc(100% - 9px) 0, 100% 9px, 100% 100%, 9px 100%, 0 calc(100% - 9px));
+  --ak-blur: blur(10px) saturate(120%);
+}
+
+@supports (backdrop-filter: blur(2px)) or (-webkit-backdrop-filter: blur(2px)) {
+  :root { --ak-blur: blur(10px) saturate(120%); }
+}
+
+/* ---------- 全局画布：冷灰细网格 + 夜色渐变 + 克制黄光 ---------- */
+html, body {
+  background:
+    radial-gradient(1100px 520px at 82% -8%, rgba(255, 216, 0, .07), transparent 62%),
+    radial-gradient(900px 480px at -10% 108%, rgba(74, 168, 255, .06), transparent 60%),
+    repeating-linear-gradient(115deg, rgba(255, 255, 255, .017) 0 1px, transparent 1px 26px),
+    linear-gradient(165deg, #161a20, #101318 55%, #0c0f13);
+  color: var(--ak-text);
+  font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans SC", sans-serif;
+}
+::selection { background: rgba(255, 216, 0, .85); color: #14171c; }
+
+/* 滚动条：细、冷灰、明黄滑块 */
+* { scrollbar-width: thin; scrollbar-color: rgba(255, 216, 0, .5) rgba(255, 255, 255, .06); }
+::-webkit-scrollbar { width: 9px; height: 9px; }
+::-webkit-scrollbar-track { background: rgba(255, 255, 255, .05); }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(255, 216, 0, .65), rgba(201, 162, 39, .55));
+  border: 2px solid rgba(20, 23, 28, .9);
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(255, 216, 0, .9); }
+
+/* ---------- 玻璃面板工具类（附加在既有面板上） ---------- */
+.akTop, .subTop, .roomPanel, .roomAside, .akRoomBar, .poolStatus, .prePanel,
+.draftAction, .draftTop, .mpCard, .miniWrap, .resultCard, .configBody, .guideBody,
+.squadCol, .draftPoolWrap, .btGear, .btFloatBtn {
+  -webkit-backdrop-filter: var(--ak-blur);
+  backdrop-filter: var(--ak-blur);
+}
+
+/* ---------- 通用按钮：斜切 + 细描边 + 高光（高光动画由 ui-anim.js 触发） ---------- */
+.akBtn {
+  background: linear-gradient(150deg, rgba(38, 45, 55, .92), rgba(26, 31, 39, .92));
+  color: var(--ak-text);
+  border: 1px solid var(--ak-stroke-2);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08), 0 6px 16px rgba(0, 0, 0, .35);
+  transition: filter .15s, transform .15s, box-shadow .18s, border-color .18s;
+}
+.akBtn:hover {
+  filter: brightness(1.12);
+  border-color: rgba(255, 216, 0, .55);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .12), 0 10px 22px rgba(0, 0, 0, .42), 0 0 18px rgba(255, 216, 0, .14);
+}
+.akBtn:active { transform: skewX(var(--skew)) translateY(2px); box-shadow: inset 0 2px 6px rgba(0, 0, 0, .5); }
+.akBtn:disabled { filter: grayscale(.45) brightness(.8); opacity: .45; }
+.akBtn em { color: var(--ak-text); }
+.akBtn small { color: var(--ak-gray); }
+.akBtnMain {
+  background: linear-gradient(140deg, #ffe066, #ffd800 45%, #e9b914);
+  color: #14171c;
+  border-color: rgba(255, 255, 255, .35);
+}
+.akBtnMain em { color: #14171c; }
+.akBtnMain small { color: rgba(20, 23, 28, .62); }
+.akBtnMain:hover { filter: brightness(1.06); border-color: rgba(255, 255, 255, .6); }
+.akBtnGhost {
+  background: rgba(18, 22, 28, .38);
+  border: 1px solid var(--ak-line-dark);
+  color: var(--ak-text-2);
+}
+.akBtnGhost:hover { color: var(--ak-text); }
+
+button, input, select, textarea { outline: none; }
+button:focus-visible, input:focus-visible {
+  border-color: var(--ak-accent) !important;
+  box-shadow: 0 0 0 2px rgba(255, 216, 0, .35);
+}
+
+/* ---------- 加载页 ---------- */
+.loadingScreen {
+  background:
+    radial-gradient(1000px 480px at 50% 12%, rgba(255, 216, 0, .07), transparent 62%),
+    linear-gradient(170deg, #12161b, #0b0e12 60%, #090b0e);
+}
+.loadBg {
+  background:
+    repeating-linear-gradient(115deg, rgba(255, 255, 255, .025) 0 2px, transparent 2px 42px),
+    radial-gradient(1200px 500px at 20% 30%, rgba(255, 216, 0, .10), transparent 60%);
+}
+.logoMark {
+  background: linear-gradient(150deg, #232a33, #141920);
+  border: 3px solid var(--ak-accent);
+  color: var(--ak-accent);
+  box-shadow: 0 0 46px rgba(255, 216, 0, .22);
+}
+.logoText strong { color: var(--ak-text); text-shadow: 0 4px 26px rgba(255, 216, 0, .18); }
+.logoText span { color: var(--ak-gray); }
+.loadDots i { background: rgba(255, 255, 255, .18); }
+.loadText { color: var(--ak-text-2); }
+.loadBarFrame {
+  background: rgba(255, 255, 255, .10);
+  border: 1px solid var(--ak-stroke);
+}
+.loadBar {
+  background: linear-gradient(90deg, var(--ak-accent-deep), var(--ak-accent));
+  box-shadow: 0 0 14px rgba(255, 216, 0, .5);
+}
+.loadPercent { color: var(--ak-accent); }
+.loadTip { color: rgba(255, 255, 255, .32); }
+
+/* ---------- 顶栏 / 侧边导航（终端） ---------- */
+.akTop {
+  background: linear-gradient(180deg, rgba(20, 24, 30, .9), rgba(16, 19, 25, .82));
+  border-bottom: 2px solid rgba(255, 216, 0, .8);
+}
+.akTop::after {
+  content: "";
+  position: absolute;
+  left: 0; bottom: -2px;
+  width: 180px; height: 6px;
+  background: var(--ak-hazard);
+  opacity: .85;
+  pointer-events: none;
+}
+.akAvatar {
+  background: linear-gradient(150deg, #2c333d, #171c23);
+  border: 1px solid rgba(255, 216, 0, .65);
+  color: var(--ak-accent);
+}
+.akPlayer strong { color: var(--ak-text); }
+.akPlayer span { color: var(--ak-gray); }
+.chip {
+  background: rgba(255, 255, 255, .06);
+  border: 1px solid var(--ak-stroke);
+  color: var(--ak-text-2);
+  clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
+}
+.akClock { color: var(--ak-accent); }
+
+.akSide {
+  background: linear-gradient(180deg, rgba(18, 22, 28, .82), rgba(13, 16, 21, .92));
+  border-right: 2px solid rgba(255, 255, 255, .16);
+}
+.akSideItem {
+  position: relative;
+  border-bottom: 1px solid rgba(255, 255, 255, .07);
+  color: var(--ak-gray);
+  cursor: pointer;
+  transition: background .18s, color .18s;
+}
+.akSideItem:hover { background: rgba(255, 255, 255, .06); color: var(--ak-text-2); }
+.akSideItem.active {
+  background: linear-gradient(160deg, #ffe066, #ffd800 55%, #e2b30e);
+  color: #14171c;
+}
+.akSideItem.active b { color: #14171c; }
+.akSideItem.active span { color: rgba(20, 23, 28, .62); }
+.akSideItem.active::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 5px;
+  background: #14171c;
+}
+
+/* ---------- 终端主视觉 ---------- */
+.akMain {
+  background:
+    repeating-linear-gradient(115deg, rgba(255, 255, 255, .016) 0 2px, transparent 2px 60px),
+    radial-gradient(1000px 460px at 78% 18%, rgba(255, 216, 0, .08), transparent 62%),
+    linear-gradient(160deg, #161a20, #10141a 55%, #0c0f14);
+}
+.kvArea::before {
+  content: "";
+  position: absolute;
+  left: -2px; top: 8px;
+  width: 4px; height: 118px;
+  background: var(--ak-hazard);
+  opacity: .8;
+  pointer-events: none;
+}
+.kvEyebrow {
+  background: var(--ak-accent);
+  color: #14171c;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+}
+.kvTitle h1 {
+  color: var(--ak-text);
+  text-shadow: 0 10px 38px rgba(0, 0, 0, .55);
+}
+.kvTitle h1::after {
+  content: "";
+  display: block;
+  width: 320px; height: 6px;
+  margin: 14px 0 0;
+  background: linear-gradient(90deg, var(--ak-accent), rgba(255, 216, 0, 0));
+}
+.kvTitle h1 span { color: var(--ak-gray); }
+.kvTitle p { color: var(--ak-text-2); }
+
+/* 装饰位：真实立绘（裁掉原图白边、深框、细描边） */
+.kvArt img.kvChar {
+  object-fit: cover;
+  object-position: 50% 8%;
+  /* 原图上下带白边：裁掉 9.5% 再放大补齐，画面满框且不露白 */
+  clip-path: inset(9.5% 0 9.5% 0);
+  scale: 1.235;
+  background: #10141a;
+  border: 1px solid var(--ak-stroke-2);
+  box-shadow: 0 22px 48px rgba(0, 0, 0, .55), inset 0 0 0 1px rgba(255, 255, 255, .05);
+}
+.kvChar::after {
+  color: rgba(255, 255, 255, .72);
+  background: linear-gradient(0deg, rgba(10, 12, 16, .82), rgba(10, 12, 16, 0));
+  left: 0; right: 0; bottom: 0;
+  padding: 8px 12px;
+}
+.kvSlab {
+  background: linear-gradient(90deg, var(--ak-accent), rgba(255, 216, 0, .05));
+  opacity: 1;
+}
+
+/* ---------- 入口按钮列 / 昵称输入区 ---------- */
+.akRoomBar {
+  background: linear-gradient(150deg, rgba(24, 29, 36, .78), rgba(17, 21, 27, .68));
+  border: 1px solid var(--ak-stroke);
+  border-left: 4px solid var(--ak-accent);
+  clip-path: var(--ak-cut);
+}
+.akRoomBar label { color: var(--ak-gray); }
+.akRoomBar input {
+  background: rgba(8, 10, 14, .55);
+  border: 1px solid var(--ak-line-dark);
+  color: var(--ak-text);
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+  transition: border-color .18s, box-shadow .18s, background .18s;
+}
+.akRoomBar input:focus {
+  background: rgba(8, 10, 14, .8);
+  border-color: rgba(255, 216, 0, .8);
+  box-shadow: 0 0 0 2px rgba(255, 216, 0, .22);
+}
+.akStatus { color: var(--ak-text-2); }
+.akFooter { color: var(--ak-gray); }
+.akFooter b { color: var(--ak-green); }
+
+/* ---------- 房间页 ---------- */
+.roomMain {
+  background:
+    repeating-linear-gradient(115deg, rgba(255, 255, 255, .015) 0 2px, transparent 2px 56px),
+    linear-gradient(160deg, #14181e, #0e1217);
+}
+.roomPanel, .roomAside {
+  background: linear-gradient(155deg, rgba(24, 29, 37, .8), rgba(16, 20, 26, .72));
+  border: 1px solid var(--ak-stroke);
+  clip-path: var(--ak-cut);
+  color: var(--ak-text-2);
+}
+.roomPanel h2, .roomAside h3 {
+  color: var(--ak-text);
+  border-left: 4px solid var(--ak-accent);
+  padding-left: 12px;
+}
+.roomPanel small, .roomAside small { color: var(--ak-gray); }
+.roomPlayer {
+  background: rgba(255, 255, 255, .05);
+  border-left: 5px solid var(--ak-blue);
+  clip-path: var(--ak-cut-s);
+}
+.roomPlayer strong { color: var(--ak-text); }
+.roomPlayer.red { border-left-color: var(--ak-red); }
+.roomAside ol { color: var(--ak-text-2); }
+.roomAside b { color: #14171c; background: var(--ak-accent); padding: 0 5px; }
+
+/* ---------- 选人页：编队斜切卡 + 选人池 ---------- */
+.draftScreen {
+  background:
+    repeating-linear-gradient(115deg, rgba(255, 255, 255, .016) 0 2px, transparent 2px 26px),
+    linear-gradient(160deg, #14181e, #0d1116);
+}
+.draftTop {
+  background: linear-gradient(180deg, rgba(20, 24, 30, .92), rgba(15, 18, 24, .84));
+  border-bottom: 2px solid rgba(255, 216, 0, .75);
+}
+.draftSide span { color: var(--ak-text); }
+.draftSide.blue span { color: var(--ak-blue); }
+.draftSide.red span { color: var(--ak-red); }
+.draftSide small { color: var(--ak-gray); }
+.draftPhase strong { color: var(--ak-text); }
+.draftPhase small {
+  background: var(--ak-accent);
+  color: #14171c;
+  font-weight: 700;
+  clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
+}
+.squadCol {
+  background: linear-gradient(160deg, rgba(22, 27, 34, .5), rgba(15, 18, 24, .32));
+  border: 1px solid var(--ak-stroke);
+  padding: 12px;
+}
+.squadCol h3 {
+  color: var(--ak-text);
+  border-left: 4px solid var(--ak-accent);
+  padding-left: 10px;
+}
+.squadCol h3 small { color: var(--ak-gray); }
+.squadCard {
+  background: linear-gradient(100deg, rgba(22, 27, 34, .96) 58%, rgba(30, 36, 45, .9));
+  border-left: 5px solid var(--ak-blue);
+  border-top: 1px solid rgba(255, 255, 255, .12);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, .32);
+}
+.squadCard.red { border-left-color: var(--ak-red); }
+.squadCard .scMeta { color: var(--ak-accent); }
+.squadCard .scName { color: var(--ak-text); text-shadow: 0 2px 6px rgba(0, 0, 0, .75); }
+.squadCard .scSkills i {
+  background: rgba(12, 15, 20, .8);
+  border: 1px solid rgba(255, 255, 255, .3);
+}
+.squadCard .scSkills i.on {
+  background: var(--ak-accent);
+  color: #14171c;
+  border-color: #fff;
+}
+.squadEmpty {
+  border: 2px dashed rgba(255, 255, 255, .22);
+  background: rgba(255, 255, 255, .03);
+}
+.squadEmpty::after { color: rgba(255, 255, 255, .22); }
+
+.poolStatus {
+  background: linear-gradient(90deg, rgba(12, 15, 20, .88), rgba(22, 27, 34, .78));
+  border-left: 4px solid var(--ak-accent);
+  color: var(--ak-text-2);
+}
+.preselectPill { background: var(--ak-accent); color: #14171c; }
+
+/* 预选面板：金边 + 轻呼吸（细节见下方 keyframes） */
+.prePanel {
+  background: linear-gradient(120deg, rgba(12, 15, 20, .92), rgba(20, 24, 31, .88));
+  border: 1px solid rgba(255, 216, 0, .45);
+  border-left: 4px solid var(--ak-accent);
+  animation: prePanelBreathe 3s ease-in-out infinite;
+}
+.prePanel .ppEmpty { color: rgba(255, 255, 255, .55); }
+.prePanel .ppAvatar {
+  border: 1px solid rgba(255, 216, 0, .6);
+  background: #0e1216;
+}
+.prePanel .ppMeta > b { color: var(--ak-text); }
+.prePanel .ppMeta > small { color: rgba(255, 255, 255, .62); }
+.prePanel .ppSkill img { border: 1px solid var(--ak-accent); }
+.prePanel .ppSkill b { color: var(--ak-text); }
+.prePanel .ppSkill small { color: var(--ak-accent); }
+.prePanel .ppSkill p { color: rgba(255, 255, 255, .72); }
+
+/* 职业组头：黄黑警示条纹小节头 */
+.poolGroup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 14px 8px 0;
+  background: linear-gradient(90deg, rgba(12, 15, 20, .95), rgba(18, 22, 28, .72));
+  border: 1px solid rgba(255, 255, 255, .1);
+  border-left: none;
+  color: var(--ak-accent);
+  letter-spacing: 4px;
+}
+.poolGroup::before {
+  content: "";
+  align-self: stretch;
+  width: 64px;
+  margin-right: 2px;
+  background: var(--ak-hazard);
+  clip-path: polygon(0 0, 100% 0, calc(100% - 12px) 100%, 0 100%);
+}
+.poolGroup small { color: rgba(255, 255, 255, .5); }
+
+/* 干员卡：悬停抬升 + 边缘光；预选金边呼吸 */
+.poolCard {
+  background: linear-gradient(105deg, rgba(24, 29, 37, .97) 46%, rgba(16, 20, 26, .92));
+  border: 1px solid var(--ak-stroke-2);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, .38);
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease, filter .18s ease;
+}
+.poolCard::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 62%;
+  z-index: 1;
+  background: linear-gradient(90deg, rgba(14, 17, 22, .95) 30%, rgba(14, 17, 22, .45) 68%, rgba(14, 17, 22, 0));
+  pointer-events: none;
+}
+.poolCard > img {
+  z-index: 0;
+  transition: transform .25s ease, filter .25s ease;
+  filter: saturate(.92);
+}
+.poolCard .pcMeta, .poolCard .pcName, .poolCard .pcRole,
+.poolCard .pcSkills, .poolCard .ribbon { z-index: 2; }
+.poolCard:hover {
+  transform: skewX(var(--skew)) translateY(-3px);
+  border-color: rgba(255, 216, 0, .55);
+  box-shadow: 0 16px 30px rgba(0, 0, 0, .5), 0 0 0 1px rgba(255, 216, 0, .5), 0 0 22px rgba(255, 216, 0, .18);
+}
+.poolCard:hover > img {
+  transform: skewX(calc(var(--skew) * -1)) scale(1.05);
+  filter: saturate(1.05);
+}
+.poolCard .pcMeta {
+  color: var(--ak-accent);
+  letter-spacing: 2px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, .8);
+}
+.poolCard .pcName {
+  color: var(--ak-text);
+  text-shadow: 0 2px 6px rgba(0, 0, 0, .85);
+}
+.poolCard .pcRole {
+  color: rgba(255, 255, 255, .62);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, .8);
+}
+.poolCard.preselect {
+  border: 2px solid var(--ak-accent);
+  animation: preselectBreathe 2.2s ease-in-out infinite;
+}
+.poolCard.taken { filter: grayscale(1) brightness(.5); }
+
+/* 技能按钮：图标 + 名字，紧凑 */
+.poolCard .pcSkills button {
+  gap: 6px;
+  height: 30px;
+  min-width: 100px;
+  background: rgba(10, 13, 17, .88);
+  border: 1px solid rgba(255, 255, 255, .22);
+  border-left: 3px solid var(--ak-accent-deep);
+  color: #fff;
+  transition: background .15s, border-color .15s, color .15s;
+}
+.poolCard .pcSkills button img {
+  width: 22px; height: 22px;
+  border: 1px solid rgba(255, 255, 255, .25);
+  background: #0d1116;
+}
+.poolCard .pcSkills button:hover {
+  background: rgba(40, 48, 58, .95);
+  border-color: rgba(255, 216, 0, .6);
+}
+.poolCard .pcSkills button.on {
+  background: linear-gradient(140deg, #ffe066, #ffd800);
+  color: #14171c;
+  border-color: rgba(255, 255, 255, .6);
+  border-left-color: #14171c;
+  font-weight: 700;
+}
+.poolCard .pcSkills button.noIcon { border-left-color: var(--ak-red); }
+.poolCard .ribbon {
+  background: var(--ak-blue);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .45);
+}
+.poolCard .ribbon.red { background: var(--ak-red); }
+
+/* 底部确认条 */
+.draftAction {
+  background: linear-gradient(90deg, rgba(12, 15, 20, .92), rgba(24, 29, 37, .84));
+  border-top: 1px solid rgba(255, 255, 255, .14);
+}
+.draftAction::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0;
+  width: 220px; height: 5px;
+  background: var(--ak-hazard);
+  opacity: .8;
+  pointer-events: none;
+}
+.draftCap {
+  background: rgba(255, 255, 255, .06);
+  color: var(--ak-text-2);
+  border-left: 5px solid var(--ak-accent);
+}
+.draftCap b { color: var(--ak-accent); }
+.actionStart {
+  position: relative;
+  background: linear-gradient(105deg, #ffcf2e, #ffe274 42%, #f0b411);
+  color: #14171c;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 20px) 100%, 0 100%);
+  box-shadow: 0 10px 26px rgba(255, 216, 0, .18);
+  transition: filter .15s, box-shadow .18s, transform .15s;
+}
+.actionStart:hover { filter: brightness(1.06); box-shadow: 0 14px 30px rgba(255, 216, 0, .28); }
+.actionStart:active { transform: translateY(2px); }
+.actionStart:disabled {
+  background: linear-gradient(105deg, #4a525c, #3a424c);
+  color: rgba(255, 255, 255, .55);
+  box-shadow: none;
+}
+.actionStart .chevrons { color: rgba(20, 23, 28, .55); }
+.actionStart:disabled .chevrons { color: rgba(255, 255, 255, .35); }
+
+/* ---------- 子页（图鉴 / 设置 / 教程） ---------- */
+.subTop {
+  background: linear-gradient(180deg, rgba(16, 20, 26, .95), rgba(12, 15, 20, .88));
+  border-bottom: 2px solid rgba(255, 216, 0, .7);
+}
+.subTop::after {
+  content: "";
+  position: absolute;
+  right: 0; bottom: -2px;
+  width: 160px; height: 6px;
+  background: var(--ak-hazard);
+  opacity: .8;
+  pointer-events: none;
+}
+.subTop strong { color: var(--ak-text); }
+.subTop small { color: var(--ak-accent); }
+.backBtn {
+  background: linear-gradient(140deg, #ffe066, #ffd800 55%, #e6ba12);
+  color: #14171c;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 12px) 100%, 0 100%);
+  transition: filter .15s;
+}
+.backBtn:hover { filter: brightness(1.07); }
+
+.rosterScreen, .configScreen, .guideScreen {
+  background:
+    repeating-linear-gradient(115deg, rgba(255, 255, 255, .015) 0 2px, transparent 2px 26px),
+    linear-gradient(160deg, #14181e, #0d1116);
+}
+.configBody {
+  background: linear-gradient(155deg, rgba(24, 29, 37, .72), rgba(15, 19, 25, .6));
+  border: 1px solid var(--ak-stroke);
+  clip-path: var(--ak-cut);
+}
+.configBody label { color: var(--ak-text-2); }
+.configBody input[type="text"], .configBody input:not([type]) {
+  background: rgba(8, 10, 14, .55);
+  border: 1px solid var(--ak-line-dark);
+  color: var(--ak-text);
+}
+.configBody input[type="checkbox"] { accent-color: var(--ak-accent); width: 16px; height: 16px; }
+.cfgNote { color: var(--ak-gray); }
+.guideBody {
+  background: linear-gradient(160deg, rgba(22, 27, 34, .6), rgba(13, 16, 21, .5));
+  color: var(--ak-text-2);
+}
+.guideBody h2, .guideBody h3, .guideBody h4 {
+  color: var(--ak-text);
+  border-left: 4px solid var(--ak-accent);
+  padding-left: 12px;
+}
+.guideBody b, .guideBody strong { color: var(--ak-accent); }
+.guideBody li { line-height: 1.9; }
+
+/* ---------- 地图整图预览 ---------- */
+.mapPreview { background: rgba(6, 8, 11, .78); }
+.mpCard {
+  background: linear-gradient(155deg, rgba(26, 31, 39, .96), rgba(16, 20, 26, .96));
+  border: 1px solid var(--ak-stroke-2);
+  border-top: 4px solid var(--ak-accent);
+  clip-path: var(--ak-cut);
+  color: var(--ak-text-2);
+}
+.mpTop b { color: var(--ak-text); }
+#mpCanvas { border: 1px solid var(--ak-stroke-2); background: #101318; }
+.mpLegend { color: var(--ak-text-2); }
+.mapCurrent { color: var(--ak-accent); }
+.mapPick {
+  background: linear-gradient(150deg, rgba(38, 45, 55, .9), rgba(26, 31, 39, .9));
+}
+.mapPick em { color: var(--ak-text); }
+.mapPick.active {
+  border: 2px solid var(--ak-accent);
+  background: linear-gradient(150deg, rgba(255, 216, 0, .22), rgba(38, 45, 55, .92));
+  box-shadow: 0 0 0 1px rgba(255, 216, 0, .3), 0 0 18px rgba(255, 216, 0, .16);
+}
+.mapPick .mapCheck { color: var(--ak-accent); }
+
+/* ---------- 小地图面板 ---------- */
+.miniWrap {
+  background: linear-gradient(160deg, rgba(16, 20, 26, .82), rgba(10, 13, 18, .78));
+  border: 1px solid var(--ak-stroke-2);
+  border-left: 3px solid var(--ak-accent);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, .45);
+}
+.miniWrap::before {
+  content: "";
+  position: absolute;
+  right: 0; top: 0;
+  width: 46px; height: 4px;
+  background: var(--ak-hazard);
+  opacity: .85;
+  pointer-events: none;
+}
+.miniTip { color: rgba(255, 255, 255, .5); }
+
+/* ---------- 结算覆盖层 ---------- */
+.resultOverlay { background: rgba(6, 8, 11, .74); }
+.resultCard {
+  position: relative;
+  background: linear-gradient(155deg, rgba(26, 31, 39, .97), rgba(14, 18, 24, .97));
+  border: 1px solid var(--ak-stroke-2);
+  border-top: 5px solid var(--ak-accent);
+  clip-path: var(--ak-cut);
+  color: var(--ak-text-2);
+  box-shadow: 0 40px 90px rgba(0, 0, 0, .6);
+}
+.resultCard::before {
+  content: "";
+  position: absolute;
+  left: 0; top: -5px;
+  width: 190px; height: 5px;
+  background: var(--ak-hazard);
+  pointer-events: none;
+}
+.resultCard h2 { color: var(--ak-text); }
+.resultCard.win h2 {
+  background: var(--ak-accent);
+  color: #14171c;
+}
+.resultCard.lose h2 { color: var(--ak-red); }
+.resultCard p { color: var(--ak-text-2); }
+.resultStats div {
+  background: rgba(255, 255, 255, .06);
+  border: 1px solid var(--ak-stroke);
+}
+.resultStats b { color: var(--ak-accent); }
+.resultStats small { color: var(--ak-gray); }
+
+/* ---------- 日志（隐藏的记录栏，保持可读） ---------- */
+.log {
+  background: rgba(12, 15, 20, .92);
+  color: var(--ak-text-2);
+  border: 1px solid var(--ak-stroke);
+}
+
+/* ---------- 旧版战斗面板（battle-ui.html 等复用）：与终端主题保持一致 ---------- */
+.battleMain {
+  background: linear-gradient(170deg, #14181e, #0d1116);
+}
+.battleLeft, .battleRight {
+  background: linear-gradient(155deg, rgba(24, 29, 37, .8), rgba(16, 20, 26, .72));
+  border: 1px solid var(--ak-stroke);
+}
+.battleLeft h3, .battleRight h3 {
+  color: var(--ak-text);
+  border-left: 4px solid var(--ak-accent);
+  padding-left: 10px;
+}
+.battleTop {
+  background: linear-gradient(180deg, rgba(20, 24, 30, .92), rgba(15, 18, 24, .84));
+  border-bottom: 2px solid rgba(255, 216, 0, .75);
+}
+.gateBox {
+  background: rgba(255, 255, 255, .06);
+  border: 2px solid var(--ak-stroke-2);
+}
+.gateBox small, .battleClock small { color: var(--ak-gray); }
+.battleClock strong { color: var(--ak-text); }
+.costBox { color: #14171c; }
+.unitInfo {
+  background: rgba(255, 255, 255, .06);
+  border-left: 4px solid var(--ak-accent-deep);
+  color: var(--ak-text-2);
+}
+.unitInfo strong { color: var(--ak-text); }
+.unitInfo .skillLine { color: #14171c; background: var(--ak-accent); }
+.spinePanel {
+  background: linear-gradient(180deg, #1c222b, #141920);
+  border: 1px solid var(--ak-stroke);
+}
+.spineState { background: rgba(255, 255, 255, .05); color: var(--ak-text-2); }
+.keyList span {
+  background: rgba(255, 255, 255, .06);
+  color: var(--ak-text-2);
+}
+.keyList b { color: #14171c; background: var(--ak-accent); }
+.legend { color: var(--ak-text-2); }
+.hand {
+  background: rgba(12, 15, 20, .5);
+}
+.handButton {
+  background: linear-gradient(150deg, rgba(38, 45, 55, .92), rgba(26, 31, 39, .92));
+  border: 1px solid var(--ak-stroke-2);
+  color: var(--ak-text);
+}
+.handButton span { color: var(--ak-gray); }
+.handButton.active {
+  border-color: var(--ak-accent);
+  background: linear-gradient(150deg, rgba(255, 216, 0, .3), rgba(38, 45, 55, .92));
+}
+
+/* ---------- 缺图底纹：暗色斜纹底，不留碎图图标（ui-anim.js 挂类） ---------- */
+.ak-img-missing {
+  background:
+    repeating-linear-gradient(-45deg, rgba(255, 255, 255, .055) 0 6px, transparent 6px 12px),
+    #12161c;
+  object-fit: contain;
+}
+
+/* ==========================================================================
+   动效基元（由 ui-anim.js 挂类触发；prefers-reduced-motion 时全部停用）
+   ========================================================================== */
+
+/* 面板进入：轻微上滑淡入（用 translate 独立属性，不覆盖元素自身 skew/transform） */
+.ak-in { animation: akPanelIn .36s cubic-bezier(.22, .8, .3, 1) both; }
+@keyframes akPanelIn {
+  from { opacity: 0; translate: 0 14px; }
+  to { opacity: 1; translate: 0 0; }
+}
+
+/* 移除按钮 hover 高光扫过效果（改为纯 CSS 过渡，更精致） */
+
+/* 数字变化：短暂高亮 */
+.ak-num-flash { animation: akNumFlash .55s ease 1; }
+@keyframes akNumFlash {
+  0% { color: var(--ak-accent); text-shadow: 0 0 16px rgba(255, 216, 0, .8); }
+  100% { color: inherit; text-shadow: none; }
+}
+
+/* toast：上浮 */
+.ak-toast-in { animation: akToastIn .3s cubic-bezier(.22, .8, .3, 1) 1; }
+@keyframes akToastIn {
+  from { opacity: 0; translate: 0 12px; }
+  to { opacity: 1; translate: 0 0; }
+}
+
+/* 选中瞬间：轻挑一下（呼吸描边见下方 preselectBreathe） */
+.ak-sel-pop { animation: akSelPop .34s cubic-bezier(.22, .8, .3, 1) 1; }
+@keyframes akSelPop {
+  from { scale: .985; filter: brightness(1.35); }
+  to { scale: 1; filter: none; }
+}
+
+/* 选中卡片：金色呼吸描边 */
+@keyframes preselectBreathe {
+  0%, 100% {
+    border-color: rgba(255, 216, 0, .85);
+    box-shadow: 0 0 0 1px rgba(255, 216, 0, .25), 0 0 12px rgba(255, 216, 0, .12), 0 10px 22px rgba(0, 0, 0, .4);
+  }
+  50% {
+    border-color: #ffe97a;
+    box-shadow: 0 0 0 3px rgba(255, 216, 0, .5), 0 0 24px rgba(255, 216, 0, .3), 0 10px 22px rgba(0, 0, 0, .4);
+  }
+}
+@keyframes prePanelBreathe {
+  0%, 100% { border-color: rgba(255, 216, 0, .38); }
+  50% { border-color: rgba(255, 216, 0, .72); }
+}
+
+/* 手牌 / 地图选中：弱呼吸 */
+.handButton.active, .mapPick.active { position: relative; }
+@keyframes selGlow {
+  0%, 100% { box-shadow: 0 0 0 1px rgba(255, 216, 0, .25); }
+  50% { box-shadow: 0 0 0 3px rgba(255, 216, 0, .45), 0 0 18px rgba(255, 216, 0, .2); }
+}
+.handButton.active { animation: selGlow 2.4s ease-in-out infinite; }
+
+/* ---------- 尊重系统"减少动态效果" ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .ak-in, .ak-num-flash, .ak-toast-in, .ak-sel-pop,
+  .preselect, .prePanel, .handButton.active { animation: none !important; }
+  .poolCard, .poolCard > img, .akBtn, .actionStart, .backBtn { transition: none !important; }
+}
+html.ak-reduce-motion .ak-in,
+html.ak-reduce-motion .ak-num-flash, html.ak-reduce-motion .ak-toast-in,
+html.ak-reduce-motion .ak-sel-pop,
+html.ak-reduce-motion .poolCard.preselect, html.ak-reduce-motion .prePanel,
+html.ak-reduce-motion .handButton.active { animation: none !important; }
+html.ak-reduce-motion .poolCard, html.ak-reduce-motion .poolCard > img,
+html.ak-reduce-motion .akBtn, html.ak-reduce-motion .actionStart,
+html.ak-reduce-motion .backBtn { transition: none !important; }
+/* ---------- 尊重系统“减少动态效果” ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .ak-in, .ak-shine, .ak-num-flash, .ak-toast-in, .ak-sel-pop, .handButton.ak-shine::after,
+  .preselect, .prePanel, .handButton.active { animation: none !important; }
+  .poolCard, .poolCard > img, .akBtn, .actionStart, .backBtn { transition: none !important; }
+}
+html.ak-reduce-motion .ak-in, html.ak-reduce-motion .ak-shine,
+html.ak-reduce-motion .ak-num-flash, html.ak-reduce-motion .ak-toast-in,
+html.ak-reduce-motion .ak-sel-pop, html.ak-reduce-motion .handButton.ak-shine::after,
+html.ak-reduce-motion .poolCard.preselect, html.ak-reduce-motion .prePanel,
+html.ak-reduce-motion .handButton.active { animation: none !important; }
+html.ak-reduce-motion .poolCard, html.ak-reduce-motion .poolCard > img,
+html.ak-reduce-motion .akBtn, html.ak-reduce-motion .actionStart,
+html.ak-reduce-motion .backBtn { transition: none !important; }

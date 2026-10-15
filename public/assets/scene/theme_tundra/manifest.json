@@ -1,0 +1,101 @@
+{
+ "id": "tundra",
+ "label": "雪原冻土（山脊）",
+ "maps": [
+  "ridge"
+ ],
+ "note": "TX_Tundra_A：积雪地块/冰裂地块/雪苔台面/冻岩断面；BG 为雪原远景。",
+ "slots": {
+  "ground_top": {
+   "file": "theme_tundra/ground_top.png",
+   "bundle": "arts\\maps\\map_tundra\\res.ab",
+   "texture": "TX_Tundra_A",
+   "rect": [
+    18,
+    14,
+    118,
+    114
+   ],
+   "size": [
+    99,
+    100
+   ],
+   "kind": "原作贴图"
+  },
+  "ground_top2": {
+   "file": "theme_tundra/ground_top2.png",
+   "bundle": "arts\\maps\\map_tundra\\res.ab",
+   "texture": "TX_Tundra_A",
+   "rect": [
+    888,
+    8,
+    990,
+    125
+   ],
+   "size": [
+    102,
+    117
+   ],
+   "kind": "原作贴图"
+  },
+  "platform_top": {
+   "file": "theme_tundra/platform_top.png",
+   "bundle": "arts\\maps\\map_tundra\\res.ab",
+   "texture": "TX_Tundra_A",
+   "rect": [
+    474,
+    135,
+    578,
+    248
+   ],
+   "size": [
+    104,
+    113
+   ],
+   "kind": "原作贴图"
+  },
+  "platform_top2": {
+   "file": "theme_tundra/platform_top2.png",
+   "bundle": "arts\\maps\\map_tundra\\res.ab",
+   "texture": "TX_Tundra_A",
+   "rect": [
+    710,
+    132,
+    820,
+    252
+   ],
+   "size": [
+    110,
+    119
+   ],
+   "kind": "原作贴图"
+  },
+  "wall_side": {
+   "file": "theme_tundra/wall_side.png",
+   "bundle": "arts\\maps\\map_tundra\\res.ab",
+   "texture": "TX_Tundra_A",
+   "rect": [
+    485,
+    315,
+    775,
+    400
+   ],
+   "size": [
+    290,
+    85
+   ],
+   "kind": "原作贴图"
+  },
+  "bg": {
+   "file": "theme_tundra/bg.png",
+   "bundle": "arts\\maps\\map_tundra\\res.ab",
+   "texture": "TX_Tundra_BG",
+   "rect": null,
+   "size": [
+    1024,
+    512
+   ],
+   "kind": "原作贴图"
+  }
+ }
+}

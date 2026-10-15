@@ -1,0 +1,54 @@
+# ===== 依赖（运行游戏不需要，仅开发用） =====
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# ===== 干员模型资源（由 spine-assets.zip 首次启动时自动解压） =====
+public/assets/spine/
+
+# ===== 开发过程产物（不提交） =====
+tools/
+extracted/
+backups/
+screenshots/
+docs/
+*.tmp
+*.bak
+*.swp
+*.swo
+*~
+
+# ===== Python 编译缓存 =====
+__pycache__/
+*.pyc
+
+# ===== 本地测试脚本（开发用，不随仓库分发） =====
+mp_test.js
+
+# ===== 日志 =====
+logs/
+*.log
+
+# ===== 环境变量 =====
+.env
+.env.local
+
+# ===== 构建产物 =====
+dist/
+build/
+coverage/
+
+# ===== IDE =====
+.vscode/
+.idea/
+*.sublime-*
+
+# ===== 操作系统 =====
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini

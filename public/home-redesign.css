@@ -1,0 +1,448 @@
+/* ==========================================================================
+   ArkFights · 首页重构 v4 - 明日方舟真实比例
+   基于实际截图参考，正确的比例和配色
+   ========================================================================== */
+
+/* ---------- 隐藏侧边栏和旧布局 ---------- */
+.akSide {
+  display: none !important;
+}
+
+.kvArea,
+.akOperationPanel,
+.opPanelLeft,
+.opPanelRight,
+.akEntryRow,
+.akRoomBar {
+  display: none !important;
+}
+
+/* ---------- 主容器：左右分栏 ---------- */
+.akMain {
+  left: 0 !important;
+  display: grid;
+  grid-template-columns: 1fr 480px;
+  gap: 0;
+  height: 100%;
+  padding: 0;
+  background:
+    repeating-linear-gradient(118deg, rgba(255,255,255,.4) 0 1px, transparent 1px 8px),
+    repeating-linear-gradient(28deg, rgba(0,0,0,.02) 0 1px, transparent 1px 12px),
+    radial-gradient(ellipse 900px 500px at 75% 35%, rgba(255,216,0,.18), transparent 65%),
+    linear-gradient(155deg, #e8e8e8, #d2d2d2 48%, #c8c8c8);
+}
+
+/* ---------- 左侧：干员展示区 ---------- */
+.akHero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  padding: 50px 60px;
+}
+
+/* 干员立绘 - 适中大小 */
+.heroArt {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 75%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.heroChar {
+  height: 100%;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+  filter: drop-shadow(-4px 8px 24px rgba(0,0,0,.35)) drop-shadow(0 0 60px rgba(255,216,0,.15));
+  animation: heroFadeIn 1.5s cubic-bezier(.22,.65,.36,1) both;
+}
+
+@keyframes heroFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.heroCharDecor {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, 
+    transparent 10%, 
+    rgba(255,216,0,.5) 35%, 
+    rgba(255,216,0,.85) 50%,
+    rgba(255,216,0,.5) 65%,
+    transparent 90%
+  );
+  box-shadow: 0 0 20px rgba(255,216,0,.4);
+}
+
+/* 左上角标题 */
+.heroContent {
+  position: relative;
+  z-index: 2;
+  max-width: 600px;
+}
+
+.heroTitle {
+  margin-bottom: 0;
+}
+
+.heroLogo {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.logoIcon {
+  width: 72px;
+  height: 72px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+  border: 3px solid #222;
+  color: #ffd800;
+  font-size: 36px;
+  font-weight: 900;
+  transform: skewX(-8deg);
+  box-shadow: 
+    0 8px 24px rgba(0,0,0,.3),
+    inset 0 1px 0 rgba(255,255,255,.1);
+}
+
+.logoText strong {
+  display: block;
+  font-size: 48px;
+  letter-spacing: 12px;
+  font-weight: 900;
+  color: #1a1a1a;
+  text-shadow: 
+    2px 2px 0 rgba(255,255,255,.5),
+    0 2px 8px rgba(0,0,0,.2);
+  line-height: 1;
+}
+
+.logoText span {
+  display: block;
+  margin-top: 8px;
+  color: #666;
+  font-size: 12px;
+  letter-spacing: 5px;
+  font-weight: 500;
+}
+
+.heroSubtitle h2 {
+  margin: 0;
+  font-size: 56px;
+  letter-spacing: 10px;
+  color: #1a1a1a;
+  font-weight: 900;
+  line-height: 1.1;
+  text-shadow: 
+    1px 1px 0 rgba(255,255,255,.6),
+    0 3px 12px rgba(0,0,0,.15);
+}
+
+.heroSubtitle p {
+  margin: 14px 0 0;
+  color: #555;
+  font-size: 16px;
+  letter-spacing: 3px;
+  font-weight: 500;
+}
+
+.heroConfig,
+.heroStatus {
+  display: none;
+}
+
+/* ---------- 右侧：功能操作区 ---------- */
+.akMenu {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 40px 35px;
+  background: 
+    linear-gradient(180deg, rgba(245,245,245,.98), rgba(235,235,235,.98));
+  border-left: 3px solid #1a1a1a;
+  box-shadow: -8px 0 32px rgba(0,0,0,.12);
+  animation: menuSlideIn 1s cubic-bezier(.22,.65,.36,1) .3s both;
+  overflow-y: auto;
+}
+
+@keyframes menuSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* 配置输入区 */
+.menuConfig {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 28px;
+  padding-bottom: 28px;
+  border-bottom: 2px solid #ccc;
+}
+
+.menuConfig .configGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.menuConfig label {
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: #666;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.menuConfig input {
+  padding: 14px 16px;
+  border: 2px solid #bbb;
+  background: #fff;
+  color: #1a1a1a;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  transition: all .2s;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,.08);
+}
+
+.menuConfig input:focus {
+  outline: none;
+  border-color: #ffd800;
+  box-shadow: 
+    inset 0 1px 3px rgba(0,0,0,.08),
+    0 0 0 3px rgba(255,216,0,.2);
+}
+
+/* 按钮网格布局 - 2列 */
+.akMenu > button {
+  /* 网格项目样式在下方定义 */
+}
+
+/* 主操作按钮区域 - 使用CSS Grid */
+#quickStartButton,
+#createRoomButton,
+#joinRoomButton,
+#copyLinkButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 20px;
+  margin: 0 6px 12px 0;
+  width: calc(50% - 6px);
+  background: linear-gradient(135deg, #fff, #f8f8f8);
+  border: 2px solid #d0d0d0;
+  color: #1a1a1a;
+  cursor: pointer;
+  transition: all .25s cubic-bezier(.22,.65,.36,1);
+  text-align: left;
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+  vertical-align: top;
+}
+
+#quickStartButton {
+  width: 100%;
+  margin-right: 0;
+  background: linear-gradient(135deg, #ffd800, #ffb800);
+  border-color: #e6c200;
+  font-weight: 700;
+  box-shadow: 
+    0 4px 16px rgba(255,216,0,.35),
+    inset 0 1px 0 rgba(255,255,255,.4);
+}
+
+#createRoomButton {
+  margin-right: 0;
+}
+
+#joinRoomButton {
+  margin-right: 0;
+}
+
+#copyLinkButton {
+  margin-right: 0;
+}
+
+/* 次要功能按钮 - 2列网格 */
+#navRoster,
+#tutStartButton,
+#guideButton,
+#navConfig {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 20px;
+  margin: 0 6px 12px 0;
+  width: calc(50% - 6px);
+  background: linear-gradient(135deg, #fff, #f8f8f8);
+  border: 2px solid #d0d0d0;
+  color: #1a1a1a;
+  cursor: pointer;
+  transition: all .25s cubic-bezier(.22,.65,.36,1);
+  text-align: left;
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+  vertical-align: top;
+}
+
+#tutStartButton,
+#navConfig {
+  margin-right: 0;
+}
+
+.menuBtn:hover,
+#quickStartButton:hover,
+#createRoomButton:hover,
+#joinRoomButton:hover,
+#copyLinkButton:hover,
+#navRoster:hover,
+#tutStartButton:hover,
+#guideButton:hover,
+#navConfig:hover {
+  background: linear-gradient(135deg, #fff, #fff);
+  border-color: #ffd800;
+  transform: translateY(-2px);
+  box-shadow: 
+    0 6px 16px rgba(255,216,0,.2),
+    0 4px 12px rgba(0,0,0,.12);
+}
+
+#quickStartButton:hover {
+  background: linear-gradient(135deg, #ffe066, #ffc933);
+  box-shadow: 
+    0 6px 20px rgba(255,216,0,.4),
+    0 6px 20px rgba(255,216,0,.3),
+    inset 0 1px 0 rgba(255,255,255,.5);
+}
+
+.menuBtn:active,
+#quickStartButton:active,
+#createRoomButton:active,
+#joinRoomButton:active,
+#copyLinkButton:active,
+#navRoster:active,
+#tutStartButton:active,
+#guideButton:active,
+#navConfig:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.menuBtnIcon {
+  width: 46px;
+  height: 46px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  font-size: 24px;
+  background: rgba(0,0,0,.06);
+  border: 1px solid rgba(0,0,0,.1);
+  box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
+}
+
+#quickStartButton .menuBtnIcon {
+  background: rgba(0,0,0,.12);
+  border-color: rgba(0,0,0,.15);
+}
+
+.menuBtnText {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.menuBtnText strong {
+  font-size: 15px;
+  letter-spacing: 1px;
+  color: inherit;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.menuBtnText small {
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: #666;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 分隔线 */
+.menuDivider {
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #ccc 20%, #ccc 80%, transparent);
+  margin: 20px 0;
+}
+
+/* 状态信息 */
+.akMenu > div:last-of-type {
+  padding: 16px 0;
+  font-size: 13px;
+  color: #555;
+  letter-spacing: 1px;
+  line-height: 1.8;
+}
+
+.akMenu > div:last-of-type span {
+  font-weight: 700;
+}
+
+/* ---------- 底部提示 ---------- */
+.akFooter {
+  position: absolute;
+  bottom: 30px;
+  left: 60px;
+  right: 410px;
+  text-align: left;
+  color: #888;
+  font-size: 11px;
+  letter-spacing: 2px;
+  z-index: 1;
+  text-shadow: 0 1px 2px rgba(255,255,255,.8);
+}
+
+/* ---------- 响应式 ---------- */
+@media (max-width: 1366px) {
+  .akMain {
+    grid-template-columns: 1fr 350px;
+  }
+  
+  .heroSubtitle h2 {
+    font-size: 48px;
+  }
+  
+  .menuBtn {
+    padding: 18px 20px;
+  }
+}

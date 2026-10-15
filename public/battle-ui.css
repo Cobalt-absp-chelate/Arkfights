@@ -1,0 +1,664 @@
+/* 战斗界面（原作 HUD 基准：全屏场景 + 半透明黑灰叠层 + 白字；移除返回/倍速/暂停） */
+.battleScreen { 
+  background: 
+    radial-gradient(1000px 600px at 50% 50%, rgba(255,216,0,.03), transparent 70%),
+    linear-gradient(165deg, #14171c, #0e1116);
+}
+
+/* —— 顶部紧凑状态条（玻璃面板 + 明黄警示线；HUD 常置顶，不被选中叠层遮挡） —— */
+.btTop {
+  position: absolute; z-index: 12; top: 0; left: 0; right: 0; height: 62px;
+  display: flex; align-items: center; gap: 16px; padding: 0 16px;
+  background: linear-gradient(180deg, rgba(16, 20, 26, .92), rgba(16, 20, 26, .6) 70%, rgba(16, 20, 26, 0));
+  border-bottom: 2px solid rgba(255, 216, 0, .45);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(0,0,0,.3);
+}
+.btTop::after {
+  content: ""; position: absolute; left: 0; bottom: -2px;
+  width: 160px; height: 5px; background: repeating-linear-gradient(-45deg, #ffd800 0 8px, rgba(20, 23, 28, .9) 8px 16px);
+  opacity: .9; pointer-events: none;
+}
+.btGear {
+  width: 46px; height: 46px; border: 1px solid rgba(255,216,0,.5);
+  background: rgba(20,24,30,.75); color: rgba(255,216,0,.9); font-size: 22px; cursor: pointer;
+  transform: skewX(var(--skew));
+  transition: filter .15s, border-color .15s, box-shadow .15s;
+  box-shadow: 0 4px 12px rgba(0,0,0,.3);
+}
+.btGear:hover { 
+  filter: brightness(1.3); 
+  border-color: rgba(255,216,0,.9); 
+  box-shadow: 0 4px 16px rgba(255,216,0,.2);
+}
+.btGate {
+  display: flex; align-items: center; gap: 10px; padding: 6px 18px;
+  background: rgba(18, 22, 28, .62); border: 1px solid rgba(255,255,255,.32); transform: skewX(var(--skew));
+  clip-path: polygon(0 0, 100% 0, calc(100% - 12px) 100%, 0 100%);
+}
+.btGate > * { transform: skewX(calc(var(--skew) * -1)); }
+.btGate b { font-size: 28px; color: #fff; }
+.btGateIcon { color: #7fd3ff; }
+.btClock {
+  margin: 0 auto; padding: 6px 22px; background: rgba(18, 22, 28, .55);
+  font-size: 24px; letter-spacing: 4px; font-weight: 700; color: #fff;
+  border-top: 1px solid rgba(255,255,255,.28); border-bottom: 1px solid rgba(255,255,255,.28);
+}
+.btTeam { color: rgba(255,255,255,.82); font-size: 12px; letter-spacing: 2px; }
+.btCost {
+  display: flex; align-items: center; gap: 10px; padding: 6px 20px;
+  background: rgba(18, 22, 28, .68); border: 1px solid rgba(255,216,0,.5); transform: skewX(var(--skew));
+}
+.btCost > * { transform: skewX(calc(var(--skew) * -1)); }
+.btCost b { font-size: 30px; color: #fff; }
+.btCostIcon { color: #ffd800; font-size: 18px; }
+
+/* —— 全屏场景 —— */
+.btBoard { position: absolute; inset: 0; padding: 0; }
+.btBoard .boardStack { height: 100%; }
+.btBoard #battleCanvas { width: 100%; height: 100%; aspect-ratio: auto; max-height: none; border: none; background: #20242a; }
+.btBoard #unitCanvas { width: 100%; height: 100%; }
+
+/* —— 右下：费用 / 部署余量 / 部署卡 —— */
+.btHand {
+  position: absolute; z-index: 6; right: 0; bottom: 0; left: 0;
+  display: flex; align-items: flex-end; justify-content: flex-end; gap: 14px;
+  padding: 10px 18px 14px;
+  background: linear-gradient(0deg, rgba(16,20,26,.92), rgba(16,20,26,.35) 65%, rgba(16,20,26,0));
+  pointer-events: none;
+  box-shadow: 0 -6px 20px rgba(0,0,0,.25);
+}
+.btHand > * { pointer-events: auto; }
+.btSlots {
+  order: 2; margin-bottom: 2px; padding: 8px 14px;
+  background: rgba(20,24,30,.85); color: #fff; font-size: 13px; letter-spacing: 1px;
+  border: 1px solid rgba(255,216,0,.4);
+  box-shadow: 0 4px 12px rgba(0,0,0,.3);
+}
+.btSlots b { font-size: 18px; margin-left: 4px; color: var(--ak-accent); }
+.btHand .hand {
+  order: 1; display: flex; gap: 8px; overflow-x: auto; max-width: none; max-height: none;
+}
+.btHand .handButton {
+  position: relative; width: 104px; height: 126px; padding: 0; overflow: hidden;
+  border: 2px solid rgba(255,216,0,.6); background: linear-gradient(135deg, #1c2028, #14181e); 
+  transform: skewX(var(--skew));
+  transition: transform .15s, box-shadow .15s, border-color .15s;
+  box-shadow: 0 4px 12px rgba(0,0,0,.4);
+}
+.btHand .handButton:hover {
+  transform: skewX(var(--skew)) translateY(-3px);
+  border-color: rgba(255,216,0,.9);
+  box-shadow: 0 6px 18px rgba(0,0,0,.5), 0 0 12px rgba(255,216,0,.3);
+}
+.btHand .handButton > * { transform: skewX(calc(var(--skew) * -1)); }
+.btHand .handButton img { width: 132%; height: 100%; object-fit: cover; margin-left: -16%; }
+.btHand .handButton .hbCost {
+  position: absolute; top: 3px; left: 3px; padding: 2px 8px;
+  background: rgba(20,20,20,.9); color: var(--ak-accent); font-weight: 700; font-size: 14px;
+  border: 1px solid rgba(255,216,0,.4);
+}
+.btHand .handButton .hbRole {
+  position: absolute; bottom: 3px; left: 3px; padding: 2px 7px;
+  background: rgba(20,20,20,.88); color: rgba(255,255,255,.9); font-size: 10px; letter-spacing: 1px;
+}
+.btHand .handButton .hbName {
+  position: absolute; bottom: 3px; right: 3px; max-width: 52px; overflow: hidden;
+  color: #fff; font-size: 11px; text-shadow: 0 1px 4px #000; white-space: nowrap; text-overflow: ellipsis;
+}
+.btHand .handButton .hbCd {
+  position: absolute; inset: 0; display: grid; place-items: center;
+  background: rgba(20,20,20,.75); font-size: 22px; font-weight: 700; color: var(--ak-accent);
+}
+.btHand .handButton.active { 
+  border-color: var(--ak-accent); 
+  box-shadow: 0 6px 20px rgba(255,216,0,.5), 0 0 0 2px var(--ak-accent); 
+  transform: skewX(var(--skew)) translateY(-4px);
+}
+.btHand .handButton.dead img { filter: grayscale(1) brightness(.5); }
+.btHand .handButton.dead { opacity: .6; }
+
+/* —— 选中干员叠层（左：大立绘裁切；右：属性/范围/技能卡，层次分明） —— */
+.unitOverlay {
+  position: absolute; z-index: 8; top: 0; left: 0; bottom: 0; width: 560px;
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  grid-template-rows: auto auto auto auto auto 1fr;
+  column-gap: 38px; row-gap: 10px;
+  padding: 68px 18px 16px;
+  background: linear-gradient(90deg, rgba(11, 14, 19, .93) 76%, rgba(11, 14, 19, .3));
+  color: #fff;
+}
+.unitOverlay::before {
+  content: ""; position: absolute; left: 0; top: 0; width: 4px; height: 100%;
+  background: linear-gradient(180deg, #ffd800, rgba(255, 216, 0, .06));
+  pointer-events: none;
+}
+@supports (backdrop-filter: blur(2px)) {
+  .unitOverlay { backdrop-filter: blur(9px) saturate(115%); }
+}
+.uoLeft { display: contents; }
+.uoLeft img {
+  grid-column: 1; grid-row: 1 / span 5;
+  width: 100%; height: 100%; min-height: 300px;
+  object-fit: cover; object-position: 50% 50%;
+  /* 大立绘自带白边：裁上下各 10% 后放大补齐，框内只剩立绘 */
+  clip-path: inset(10% 0 10% 0);
+  scale: 1.25;
+  border: 1px solid rgba(255,255,255,.22);
+  background: #0d1116;
+}
+.uoClose {
+  position: absolute; top: 72px; right: 14px; z-index: 3;
+  width: 32px; height: 32px; border: 1px solid rgba(255,255,255,.5);
+  background: rgba(20,20,20,.7); color: #fff; cursor: pointer;
+  transition: background .15s, border-color .15s;
+}
+.uoClose:hover { background: rgba(255, 91, 74, .85); border-color: #fff; }
+.uoName { grid-column: 2; grid-row: 1; display: flex; align-items: baseline; gap: 10px; }
+.uoName b { font-size: 28px; letter-spacing: 3px; }
+.uoName span { color: rgba(255,255,255,.7); letter-spacing: 2px; font-size: 12px; }
+.uoStats {
+  grid-column: 2; grid-row: 2;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 6px 14px;
+  padding: 10px 12px;
+  background: rgba(14, 18, 24, .78);
+  border: 1px solid rgba(255,255,255,.12);
+  border-left: 3px solid var(--ak-accent-deep);
+  font-size: 13px;
+}
+.uoStats span { white-space: nowrap; }
+.uoStats span { display: flex; justify-content: space-between; color: rgba(255,255,255,.68); letter-spacing: 1px; }
+.uoStats b { color: var(--ak-accent); }
+.uoHealth {
+  grid-column: 2; grid-row: 3;
+  display: flex; justify-content: space-between; font-size: 14px;
+  border-bottom: 2px solid #7fd3ff; padding-bottom: 3px;
+}
+.uoHealth b { color: #7fd3ff; }
+.uoRange { grid-column: 2; grid-row: 4; width: 118px; }
+.uoRangeTitle {
+  padding: 3px 8px; background: rgba(255,255,255,.85); color: #222;
+  font-size: 11px; letter-spacing: 2px; text-align: center;
+}
+#uoRangeCanvas {
+  display: block; width: 118px; height: 118px;
+  background: rgba(30,30,30,.82); border: 1px solid rgba(255,255,255,.4);
+}
+.uoTabs { grid-column: 2; grid-row: 5; display: flex; gap: 6px; align-self: end; }
+.uoTab {
+  padding: 8px 22px; border: 1px solid rgba(255,255,255,.3); background: rgba(30,30,30,.55);
+  color: rgba(255,255,255,.78); cursor: pointer; transform: skewX(var(--skew));
+  transition: background .15s, color .15s;
+}
+.uoTab:hover { background: rgba(255,255,255,.16); color: #fff; }
+.uoTab.active { background: var(--ak-accent); color: #14171c; border-color: rgba(255,255,255,.6); font-weight: 700; }
+.uoSkill {
+  grid-column: 1 / span 2; grid-row: 6; align-self: start;
+  display: grid; grid-template-columns: 58px minmax(0, 1fr) 104px; gap: 12px;
+  align-items: start;
+  padding: 12px;
+  background: rgba(14, 18, 24, .78);
+  border: 1px solid rgba(255,255,255,.12);
+  border-top: 2px solid var(--ak-accent);
+}
+.uoSkillBody { grid-column: 2; min-width: 0; }
+.uoSkillIcon {
+  width: 58px; height: 58px; display: grid; place-items: center;
+  background: linear-gradient(150deg, #3b82c4, #245f95); color: #fff; font-size: 28px;
+  border: 1px solid rgba(255,255,255,.55);
+}
+.uoSkillBody b { font-size: 17px; }
+.uoSkillTags { margin: 5px 0; display: flex; gap: 6px; flex-wrap: wrap; }
+.uoSkillTags span { padding: 2px 8px; font-size: 11px; background: var(--ak-green); color: #fff; }
+.uoSkillTags .tagManual { background: rgba(255,255,255,.72); color: #333; }
+.uoSkillTags .tagTime { background: rgba(30,30,30,.8); color: #fff; border: 1px solid rgba(255,255,255,.4); }
+.uoSkillBody p { margin: 6px 0 0; color: rgba(255,255,255,.88); font-size: 12px; line-height: 1.55; }
+.uoSkillButton {
+  position: static; justify-self: end;
+  width: 96px; height: 96px;
+  border: 3px solid rgba(255,255,255,.9); background: #2f7fc4; color: #fff; cursor: pointer;
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+  transition: filter .15s, transform .15s;
+}
+.uoSkillButton:hover { filter: brightness(1.16); }
+.uoSkillButton:active { transform: translateY(2px); }
+.uoSkillButton b { display: block; font-size: 26px; }
+.uoSkillButton span {
+  display: block; margin-top: 2px; font-size: 11px; letter-spacing: 2px;
+}
+.uoSkillButton.cooling { background: rgba(60,60,60,.9); color: rgba(255,255,255,.75); }
+.uoSkillButton.active { background: var(--ak-green); }
+.uoSkillButton #uoSkillState { padding: 1px 6px; background: var(--ak-green); color: #111; font-weight: 700; }
+
+/* 瞬时提示（替代常驻日志栏） */
+.toastArea {
+  position: absolute; z-index: 9; top: 78px; left: 50%; transform: translateX(-50%);
+  display: flex; flex-direction: column; gap: 6px; align-items: center; pointer-events: none;
+}
+.toast {
+  padding: 8px 18px; background: rgba(16, 20, 26, .82); color: #fff;
+  border-left: 4px solid var(--ak-accent); border-right: 1px solid rgba(255,255,255,.14);
+  border-top: 1px solid rgba(255,255,255,.14); border-bottom: 1px solid rgba(255,255,255,.14);
+  font-size: 13px; letter-spacing: 1px;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+  opacity: 1; transition: opacity .6s;
+}
+.toast.good { border-left-color: var(--ak-green); }
+.toast.bad { border-left-color: var(--ak-red); }
+.toast.fade { opacity: 0; }
+
+/* 浮层：R / F / X 三键成组（X 危险键红色调） + 模式徽章 */
+.btFloat {
+  position: absolute; z-index: 7; right: 18px; bottom: 168px;
+  display: flex; align-items: center; gap: 8px; padding: 8px 10px;
+  background: rgba(16, 20, 26, .85); border: 1px solid rgba(255,216,0,.35);
+  box-shadow: 0 4px 16px rgba(0,0,0,.4);
+}
+.btFloat::before {
+  content: ""; position: absolute; left: 0; top: -1px;
+  width: 70px; height: 3px;
+  background: repeating-linear-gradient(-45deg, #ffd800 0 7px, rgba(20, 23, 28, .9) 7px 14px);
+  pointer-events: none; opacity: .9;
+}
+.btFloatBtn {
+  padding: 10px 16px; border: 1px solid rgba(255,216,0,.5); background: rgba(28, 33, 41, .9);
+  color: var(--ak-text); cursor: pointer; transform: skewX(var(--skew)); font-weight: 700;
+  transition: filter .15s, border-color .15s, background .15s, box-shadow .15s;
+  box-shadow: 0 2px 8px rgba(0,0,0,.3);
+  font-size: 13px; letter-spacing: 1px;
+}
+.btFloatBtn > * { transform: skewX(calc(var(--skew) * -1)); }
+.btFloatBtn:hover { 
+  filter: brightness(1.2); 
+  border-color: rgba(255,216,0,.9);
+  box-shadow: 0 4px 12px rgba(255,216,0,.2);
+}
+.btFloatBtn.danger {
+  background: rgba(140, 35, 30, .9);
+  border-color: rgba(255, 91, 74, .8);
+  color: #ffd9d5;
+}
+.btFloatBtn.danger:hover {
+  background: rgba(180, 45, 38, .95);
+  border-color: var(--ak-red);
+  box-shadow: 0 4px 12px rgba(255, 91, 74,.3);
+}
+.btFloatBtn:disabled {
+  opacity: .4;
+  cursor: not-allowed;
+  filter: grayscale(.7);
+}
+.btFloatBtn.ghost { background: rgba(20,20,20,.6); color: rgba(255,255,255,.75); }
+.btModeBadge {
+  padding: 6px 12px; margin-left: 4px;
+  background: rgba(255, 216, 0, .92); color: #14171c;
+  font-size: 12px; font-weight: 700; letter-spacing: 2px;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+}
+.btModeBadge:empty { display: none; }
+.btLog {
+  position: absolute; z-index: 5; right: 18px; top: 76px; width: 292px; height: 168px;
+  border: 1px solid rgba(255,255,255,.28); background: rgba(18,18,18,.5); color: rgba(255,255,255,.88);
+}
+
+/* —— 原作 HUD 对齐（顶部队列 / 右下费用） —— */
+.btCounters { display: flex; align-items: center; gap: 30px; margin: 0 auto; }
+.btEnemy, .btGate { display: flex; align-items: baseline; gap: 8px; }
+.btEnemy small { color: rgba(255, 214, 90, .9); font-size: 11px; letter-spacing: 3px; }
+.btEnemy b { font-size: 28px; color: #fff; }
+.btEnemyIcon { color: #ffd65a; font-size: 20px; }
+.btSide { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; margin-left: auto; order: 2; }
+.btSide .btCost {
+  transform: none; padding: 6px 20px 8px;
+  background: rgba(14, 17, 22, .78);
+  border: 1px solid rgba(255, 216, 0, .45);
+  clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%);
+}
+.btSide .btCost b { font-size: 40px; color: #fff; }
+.btSide .btSlots {
+  transform: none; padding: 6px 14px;
+  background: rgba(14, 17, 22, .72); color: rgba(255,255,255,.86);
+  border: 1px solid rgba(255, 255, 255, .18);
+  clip-path: polygon(0 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+}
+.btSlots b { color: var(--ak-accent); }
+.btHand { align-items: flex-end; gap: 16px; }
+
+/* 部署卡：立绘 + 顶点费用/快捷键 + 底部职业/代号 */
+.btHand .handButton {
+  border: 2px solid rgba(255,255,255,.5);
+  background: #22272e;
+  box-shadow: 0 8px 18px rgba(0,0,0,.45);
+  transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease;
+}
+.btHand .handButton:hover {
+  transform: skewX(var(--skew)) translateY(-3px);
+  border-color: rgba(255,216,0,.75);
+  box-shadow: 0 14px 26px rgba(0,0,0,.5), 0 0 16px rgba(255,216,0,.22);
+}
+.btHand .handButton .hbCost {
+  background: rgba(12, 15, 20, .88);
+  color: var(--ak-accent);
+  letter-spacing: 1px;
+}
+.btHand .handButton .hbRole {
+  background: rgba(12, 15, 20, .88);
+  color: rgba(255,255,255,.82);
+}
+.btHand .handButton .hbName {
+  background: rgba(12, 15, 20, .82);
+  padding: 1px 6px;
+  color: #fff;
+}
+.btHand .handButton.active {
+  border-color: var(--ak-accent);
+  box-shadow: 0 0 0 2px rgba(255,216,0,.85), 0 0 22px rgba(255,216,0,.35);
+}
+.btHand .handButton.dead img { filter: grayscale(1) brightness(.55); }
+.btHand .handButton .hbCd { background: rgba(12, 15, 20, .78); }
+
+/* —— 可信输入修复：选中叠层不拦截战场/手牌点击（仅面板按钮可点） —— */
+.unitOverlay { pointer-events: none; }
+.unitOverlay .uoClose, .unitOverlay .uoTab, .unitOverlay .uoSkillButton,
+.unitOverlay #unitOverlayClose, .unitOverlay #uoSkillButton { pointer-events: auto; }
+.btHand { z-index: 10; }
+
+/* —— 线路条（简化选路：线路切换 / 高级途经点 / 跟随状态） + 跟随拖放提示 —— */
+#routeCanvas {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  pointer-events: none; z-index: 6;
+}
+.routeBar {
+  position: absolute; z-index: 9; left: 18px; bottom: 168px;
+  display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
+  max-width: min(720px, calc(100% - 36px));
+  padding: 8px 12px;
+  background: rgba(14, 17, 22, .72); border: 1px solid rgba(255,255,255,.16);
+}
+.routeBar::before {
+  content: ""; position: absolute; left: 0; top: -1px;
+  width: 64px; height: 3px;
+  background: repeating-linear-gradient(-45deg, #54b8ff 0 7px, rgba(20, 23, 28, .9) 7px 14px);
+  pointer-events: none;
+}
+.routeBar .rbLabel {
+  color: rgba(255,255,255,.75); font-size: 12px; letter-spacing: 2px; white-space: nowrap;
+}
+.routeLines { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.rbLineBtn {
+  padding: 7px 12px; border: 1px solid rgba(255,255,255,.32); background: rgba(28, 33, 41, .85);
+  color: #fff; cursor: pointer; transform: skewX(var(--skew)); font-size: 12px; font-weight: 700;
+  transition: filter .15s, border-color .15s, background .15s;
+}
+.rbLineBtn > span { display: inline-block; transform: skewX(calc(var(--skew) * -1)); }
+.rbLineBtn:hover { filter: brightness(1.2); border-color: rgba(84,184,255,.7); }
+.rbLineBtn.active {
+  background: rgba(84, 184, 255, .92); color: #10141b; border-color: #fff; font-weight: 800;
+}
+.rbBtn {
+  padding: 7px 12px; border: 1px solid rgba(255,255,255,.32); background: rgba(28, 33, 41, .85);
+  color: #fff; cursor: pointer; transform: skewX(var(--skew)); font-size: 12px; font-weight: 700;
+}
+.rbBtn:hover { filter: brightness(1.2); border-color: rgba(255,216,0,.6); }
+.rbBtn.active { background: rgba(255, 216, 0, .92); color: #14171c; }
+.rbBtn.hidden { display: none; }
+.rbHint {
+  color: rgba(255,255,255,.62); font-size: 12px; min-width: 120px; flex: 1 1 160px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.rbFollow {
+  padding: 6px 12px; background: rgba(84,184,255,.9); color: #10141b;
+  font-size: 12px; font-weight: 700; letter-spacing: 1px;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+}
+.rbFollow:empty { display: none; }
+.followTip {
+  position: absolute; z-index: 9; padding: 6px 12px;
+  background: rgba(84, 184, 255, .92); color: #10141b;
+  font-size: 13px; font-weight: 700; letter-spacing: 1px;
+  border: 1px solid #fff; pointer-events: none;
+  transform: translate(-50%, -140%);
+  clip-path: polygon(0 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+}
+.followTip.hidden { display: none; }
+.btFloat { z-index: 11; }
+
+/* Battle controls stay inside the screen while the field fills the canvas. */
+.battleScreen {
+  --battle-top-height: 62px;
+  --battle-hand-height: 148px;
+}
+html:has(#battleScreen:not(.hidden)), body:has(#battleScreen:not(.hidden)) {
+  min-width: 0;
+  min-height: 0;
+}
+.battleScreen .btBoard { overflow: hidden; }
+.battleScreen .btHand { height: var(--battle-hand-height); padding: 8px 16px 10px; gap: 12px; }
+.battleScreen .btHand .hand {
+  flex: 1 1 auto; min-width: 0; max-width: calc(100% - 156px);
+  padding: 4px 5px 0; gap: 7px; scrollbar-width: thin; overflow-y: hidden;
+  scrollbar-color: rgba(255,255,255,.35) transparent;
+  background: transparent; user-select: none;
+}
+.battleScreen .btHand .handButton {
+  flex: 0 0 auto; width: clamp(74px, 7.5vw, 104px);
+  height: clamp(94px, 8.4vw, 118px); touch-action: none;
+}
+.battleScreen .btHand .hand::-webkit-scrollbar { height: 4px; }
+.battleScreen .btHand .hand::-webkit-scrollbar-thumb { background: rgba(255,255,255,.35); }
+.battleScreen .btHand .handButton img { pointer-events: none; -webkit-user-drag: none; }
+.battleScreen .btHand .handButton.onField {
+  border-color: rgba(255,255,255,.24); background: #202329;
+  box-shadow: 0 3px 8px rgba(0,0,0,.28); cursor: pointer;
+}
+.battleScreen .btHand .handButton.onField img { filter: grayscale(1) brightness(.43); }
+.battleScreen .btHand .handButton.onField .hbCost { color: rgba(255,255,255,.55); }
+.battleScreen .btHand .handButton.onField.active { border-color: #ddd; animation: none; }
+.battleScreen .btHand .handButton .hbOnField {
+  position: absolute; left: 0; right: 0; top: 42%; text-align: center;
+  padding: 3px 0; background: rgba(15,18,22,.7); color: #e6e8eb;
+  font-size: 12px; letter-spacing: 3px; pointer-events: none;
+}
+.battleScreen .btHand .handButton.deployDragging {
+  opacity: .45; border-color: var(--ak-accent); transition: none;
+}
+.deployDragPreview {
+  position: fixed; z-index: 100; width: 80px; height: 102px; overflow: hidden;
+  border: 2px solid var(--ak-accent); background: rgba(20,23,29,.8);
+  box-shadow: 0 8px 24px rgba(0,0,0,.5); pointer-events: none;
+  transform: translate(-50%, -85%); opacity: .85;
+}
+.deployDragPreview img { width: 100%; height: 100%; object-fit: cover; }
+.deployDragPreview.valid { border-color: #57c98a; }
+.deployDragPreview.invalid { border-color: #ff5b4a; opacity: .55; }
+.battleScreen .btFloat {
+  bottom: calc(var(--battle-hand-height) + 6px); right: 16px; gap: 7px; padding: 6px 8px;
+}
+.battleScreen .btFloatBtn { min-height: 38px; padding: 7px 13px; }
+.battleScreen .btFloatBtn:disabled {
+  opacity: .35; cursor: default; filter: grayscale(1); border-color: rgba(255,255,255,.16);
+}
+.battleScreen .btFloatBtn[hidden], .battleScreen .btFloat[hidden] { display: none !important; }
+.battleScreen .routeBar {
+  bottom: calc(var(--battle-hand-height) + 6px); left: 16px;
+  max-width: min(680px, calc(100% - 440px)); padding: 7px 10px;
+}
+.battleScreen .rbHint { flex-basis: 100%; font-size: 11px; }
+.battleScreen .rbLineBtn, .battleScreen .rbBtn { min-height: 32px; padding: 5px 9px; }
+
+/* The portrait and skill controls share one temporary panel; its bottom never
+   falls behind the cards. Art keeps its natural transparent bounds. */
+.battleScreen .unitOverlay {
+  top: calc(var(--battle-top-height) + 6px); bottom: calc(var(--battle-hand-height) + 6px);
+  width: min(480px, 43vw); min-width: 360px;
+  grid-template-columns: minmax(116px, 170px) minmax(0, 1fr);
+  grid-template-rows: auto auto auto 96px auto auto;
+  column-gap: 16px; row-gap: 8px; padding: 16px 16px 12px;
+  align-content: start;
+  overflow-y: auto; overflow-x: hidden; scrollbar-width: thin;
+  background: linear-gradient(90deg, rgba(11,14,19,.9), rgba(11,14,19,.69) 82%, rgba(11,14,19,.12));
+}
+.battleScreen .uoLeft img {
+  object-fit: contain; object-position: center bottom; min-height: 0;
+  clip-path: none; scale: none; border: none; background: transparent;
+}
+.battleScreen .uoClose { top: 6px; right: 6px; width: 28px; height: 28px; }
+.battleScreen .uoName { min-width: 0; padding-right: 18px; flex-wrap: wrap; gap: 2px 8px; }
+.battleScreen .uoName b { font-size: 24px; letter-spacing: 1px; overflow-wrap: anywhere; }
+.battleScreen .uoName span { font-size: 11px; letter-spacing: 1px; }
+.battleScreen .uoStats { gap: 5px 10px; padding: 7px 8px; font-size: 12px; }
+.battleScreen .uoStats span { letter-spacing: 0; }
+.battleScreen .uoHealth { font-size: 12px; gap: 8px; }
+.battleScreen .uoRange { width: 94px; }
+.battleScreen #uoRangeCanvas { width: 94px; height: 76px; }
+.battleScreen .uoRangeTitle { font-size: 10px; letter-spacing: 1px; }
+.battleScreen .uoTab { padding: 6px 11px; font-size: 12px; }
+.battleScreen .uoSkill {
+  grid-template-columns: 44px minmax(0, 1fr) 70px; gap: 9px; padding: 10px 8px;
+}
+.battleScreen .uoSkillIcon { width: 44px; height: 44px; font-size: 24px; }
+.battleScreen .uoSkillIcon img { width: 100%; height: 100%; object-fit: contain; }
+.battleScreen .uoSkillBody b { font-size: 14px; }
+.battleScreen .uoSkillBody p { font-size: 11px; line-height: 1.5; overflow-wrap: anywhere; }
+.battleScreen .uoSkillBody { pointer-events: none; }   /* 说明文字不拦截战场输入（不遮挡战场；技能按钮单独可点） */
+.battleScreen .uoSkillTags { gap: 4px; }
+.battleScreen .uoSkillTags span { padding: 2px 5px; font-size: 10px; }
+.battleScreen .uoSkillButton { width: 70px; height: 70px; border-width: 2px; }
+.battleScreen .uoSkillButton b { font-size: 22px; }
+.battleScreen .uoSkillButton span { font-size: 10px; letter-spacing: 0; }
+.battleScreen .uoSkillButton:disabled { cursor: default; }
+.battleScreen .uoSkillButton.ready, .battleScreen .uoSkillButton.skillReady {
+  background: #efb22e; color: #171a20; filter: drop-shadow(0 0 8px rgba(255,216,0,.45));
+}
+.battleScreen .uoSp { grid-column: 1 / -1; grid-row: 7; margin-top: 4px; font-size: 11px; color: #a7e4ff; }
+.battleScreen .uoSpTrack {
+  height: 4px; margin-top: 4px; overflow: hidden; background: rgba(255,255,255,.16);
+}
+.battleScreen .uoSpFill { display: block; height: 100%; background: #66d8ef; transition: width .12s linear; }
+.battleScreen .uoSp.ready .uoSpFill { background: #ffd800; }
+
+.battleScreen .btGearPanel {
+  position: absolute; z-index: 18; top: calc(var(--battle-top-height) + 8px); left: 14px;
+  width: min(320px, calc(100vw - 28px)); padding: 14px 16px;
+  background: rgba(12,16,22,.94); color: #fff;
+  border: 1px solid rgba(255,255,255,.3); border-top: 3px solid var(--ak-accent);
+  box-shadow: 0 12px 30px rgba(0,0,0,.45);
+}
+.battleScreen .btGearPanel[hidden], .battleScreen .btGearPanel.hidden { display: none !important; }
+.battleScreen .btGearPanel h3 { margin: 0 0 12px; font-size: 15px; letter-spacing: 2px; }
+.battleScreen .btGearPanel p { margin: 12px 0 0; font-size: 12px; color: #c0c8d3; line-height: 1.65; }
+.battleScreen .btGearPanel > button { margin-top: 10px; min-height: 32px; padding: 5px 12px; border: 1px solid rgba(255,255,255,.35); background: #272e37; color: #fff; cursor: pointer; }
+.battleScreen .uoSkillButton.cooling #uoSkillState { background: rgba(255,255,255,.16); color: #ddd; }
+.battleScreen .btFloatBtn.active { border-color: #ffd800; color: #ffd800; }
+.battleScreen .btViewOptions { display: flex; gap: 6px; }
+.battleScreen .btViewOptions button {
+  flex: 1; min-height: 38px; border: 1px solid rgba(255,255,255,.3);
+  background: rgba(255,255,255,.06); color: #fff; cursor: pointer; font-size: 12px;
+}
+.battleScreen .btViewOptions button.active { background: var(--ak-accent); color: #15171d; border-color: #ffd800; }
+.battleScreen button:focus-visible { outline: 2px solid #8bd9ff; outline-offset: 3px; }
+
+@media (max-height: 760px) {
+  .battleScreen { --battle-top-height: 52px; --battle-hand-height: 124px; }
+  .battleScreen .btTop { height: 52px; gap: 10px; padding: 0 12px; }
+  .battleScreen .btGear { width: 38px; height: 38px; font-size: 20px; }
+  .battleScreen .btGate b, .battleScreen .btEnemy b { font-size: 24px; }
+  .battleScreen .btClock { font-size: 20px; padding: 5px 14px; }
+  .battleScreen .btHand .handButton { height: 100px; width: 82px; }
+  .battleScreen .btHand { padding: 6px 12px 8px; }
+  .battleScreen .btSide .btCost b { font-size: 30px; }
+  .battleScreen .btSide .btSlots { font-size: 11px; padding: 5px 9px; }
+  .battleScreen .unitOverlay { row-gap: 6px; grid-template-rows: auto auto auto 83px auto auto; padding: 12px; }
+  .battleScreen .uoRange { width: 82px; }
+  .battleScreen #uoRangeCanvas { width: 82px; height: 64px; }
+  .battleScreen .uoName b { font-size: 21px; }
+  .battleScreen .uoSkillBody p { margin-top: 4px; }
+}
+@media (max-width: 900px) {
+  .battleScreen .btTop { gap: 8px; padding: 0 10px; }
+  .battleScreen .btCounters { gap: 12px; }
+  .battleScreen .btTeam { display: none; }
+  .battleScreen .btEnemy small { display: none; }
+  .battleScreen .btGate { padding: 5px 10px; }
+  .battleScreen .btFloat { bottom: calc(var(--battle-hand-height) + 4px); right: 12px; }
+  .battleScreen .routeBar {
+    bottom: calc(var(--battle-hand-height) + 58px); left: 12px; max-width: calc(100% - 24px);
+  }
+  .battleScreen .unitOverlay { width: min(430px, 78vw); min-width: 300px; }
+  .battleScreen .miniWrap { right: 8px; top: calc(var(--battle-top-height) + 10px); padding: 4px; }
+  .battleScreen #miniMap { width: 154px; height: auto; }
+  .battleScreen .btHand .hand { max-width: calc(100% - 125px); gap: 5px; }
+  .battleScreen .btHand .handButton { width: 72px; height: 90px; }
+  .battleScreen .btSide .btCost { padding: 4px 14px; }
+  .battleScreen .btSide .btSlots { font-size: 10px; letter-spacing: 0; }
+}
+@media (max-height: 540px) {
+  .battleScreen { --battle-hand-height: 124px; }
+  .battleScreen .btHand .handButton { width: 66px; height: 80px; }
+  .battleScreen .unitOverlay {
+    width: min(480px, 64vw); grid-template-columns: 106px minmax(0, 1fr);
+    grid-template-rows: auto auto auto 30px auto;
+  }
+  .battleScreen .uoLeft img { grid-row: 1 / span 4; }
+  .battleScreen .uoStats { padding: 4px 6px; }
+  .battleScreen .uoRange { display: none; }
+  .battleScreen .uoTabs { grid-row: 4; }
+  .battleScreen .uoSkill { grid-row: 5; }
+  .battleScreen .btFloatBtn { font-size: 11px; min-height: 32px; padding: 5px 8px; }
+}
+
+/* —— 战场安全区（相机投影避让/安全区）——世界绘制在顶栏与底部手牌/操作栏之间裁剪：
+   战场下沿单位不与底部手牌/操作栏重叠；只裁显示（投影/拾取/世界坐标不变），格子尺寸不变（保持可辨度）。 */
+.battleScreen .boardStack > canvas {
+  clip-path: inset(calc(var(--battle-top-height) + 4px) 0 calc(var(--battle-hand-height) + 4px) 0);
+}
+
+/* —— 四向朝向选择（代理B）：主操作=按住模型拖向选向；此面板仅无干扰备用（小/半透明，Esc/Enter 同效） —— */
+.facingPicker {
+  position: fixed; z-index: 26; width: 124px; height: 124px;
+  transform: translate(-50%, -100%); pointer-events: none;
+  display: grid; grid-template-columns: repeat(3, 38px); grid-template-rows: repeat(3, 38px);
+  justify-content: center; align-content: center; gap: 2px;
+  opacity: .72; transition: opacity .15s ease;
+}
+.facingPicker:hover { opacity: 1; }
+.facingPicker.hidden { display: none !important; }
+.facingPicker .fpDir {
+  width: 38px; height: 38px; padding: 0; cursor: pointer; pointer-events: auto;
+  border: 1px solid rgba(255, 216, 0, .55); border-radius: 8px;
+  background: rgba(16, 20, 27, .82); color: #ffe27a; font-size: 15px; line-height: 1;
+  transition: background .12s ease, color .12s ease, border-color .12s ease, transform .12s ease;
+}
+.facingPicker .fpDir:hover { background: rgba(255, 216, 0, .22); }
+.facingPicker .fpDir.candidate {
+  background: #ffd800; color: #14171d; border-color: #fff2b0;
+  box-shadow: 0 0 10px rgba(255, 216, 0, .55); transform: scale(1.06);
+}
+.facingPicker .fpUp { grid-column: 2; grid-row: 1; }
+.facingPicker .fpLeft { grid-column: 1; grid-row: 2; }
+.facingPicker .fpConfirm {
+  grid-column: 2; grid-row: 2; font-size: 20px;
+  background: rgba(47, 163, 107, .9); color: #fff; border-color: #7fe0ad;
+}
+.facingPicker .fpConfirm:hover { background: #2fa36b; }
+.facingPicker .fpRight { grid-column: 3; grid-row: 2; }
+.facingPicker .fpDown { grid-column: 2; grid-row: 3; }
+.facingPicker .fpLabel {
+  grid-column: 1 / span 3; grid-row: 4; text-align: center;
+  color: #ffe27a; font-size: 12px; letter-spacing: 2px; white-space: nowrap;
+  background: rgba(16, 20, 27, .78); border-radius: 6px; padding: 2px 0;
+}
+.facingHint {
+  position: fixed; z-index: 25; left: 50%; top: calc(var(--battle-top-height, 62px) + 10px);
+  transform: translateX(-50%); pointer-events: auto; cursor: pointer;
+  padding: 7px 18px; border: 1px solid rgba(255, 216, 0, .55); border-radius: 8px;
+  background: rgba(18, 22, 28, .88); color: #ffe27a;
+  font-size: 13px; letter-spacing: 1px; white-space: nowrap;
+  animation: facingHintPulse 1.6s ease-in-out infinite;
+}
+.facingHint.hidden { display: none !important; }
+@keyframes facingHintPulse {
+  0%, 100% { opacity: .82; }
+  50% { opacity: 1; }
+}

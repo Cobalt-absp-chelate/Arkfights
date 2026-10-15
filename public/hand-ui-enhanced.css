@@ -1,0 +1,431 @@
+/* ========================================
+   手牌区增强样式 - 动效、光效、召唤物支持
+   ======================================== */
+
+/* —— 手牌容器增强 —— */
+.btHand .hand {
+  /* 保持原有样式，添加性能优化 */
+  will-change: scroll-position;
+}
+
+/* —— 普通干员卡片美化 —— */
+.btHand .handButton {
+  /* 增强背景渐变 */
+  background: linear-gradient(135deg, 
+    rgba(28, 32, 40, 0.95), 
+    rgba(20, 24, 30, 0.98)
+  );
+  border: 2px solid rgba(255, 216, 0, 0.5);
+  box-shadow: 
+    0 6px 16px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  
+  /* 性能优化 */
+  will-change: transform, box-shadow;
+  transition: 
+    transform 0.18s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.18s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* 入场动画 */
+  animation: handCardEnter 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* 入场动画关键帧 */
+@keyframes handCardEnter {
+  0% {
+    opacity: 0;
+    transform: skewX(var(--skew)) translateY(30px) scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: skewX(var(--skew)) translateY(0) scale(1);
+  }
+}
+
+/* 逐个延迟入场 */
+.btHand .handButton:nth-child(1) { animation-delay: 0.05s; }
+.btHand .handButton:nth-child(2) { animation-delay: 0.10s; }
+.btHand .handButton:nth-child(3) { animation-delay: 0.15s; }
+.btHand .handButton:nth-child(4) { animation-delay: 0.20s; }
+.btHand .handButton:nth-child(5) { animation-delay: 0.25s; }
+.btHand .handButton:nth-child(6) { animation-delay: 0.30s; }
+.btHand .handButton:nth-child(7) { animation-delay: 0.35s; }
+.btHand .handButton:nth-child(8) { animation-delay: 0.40s; }
+.btHand .handButton:nth-child(9) { animation-delay: 0.45s; }
+.btHand .handButton:nth-child(10) { animation-delay: 0.50s; }
+
+/* —— 悬停效果增强 —— */
+.btHand .handButton:hover:not(.dead):not(.onField):not(.cooldown) {
+  transform: skewX(var(--skew)) translateY(-5px) scale(1.02);
+  border-color: rgba(255, 216, 0, 0.95);
+  box-shadow: 
+    0 10px 28px rgba(0, 0, 0, 0.6),
+    0 0 20px rgba(255, 216, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  z-index: 10;
+}
+
+/* —— 点击/激活效果 —— */
+.btHand .handButton:active:not(.dead):not(.onField) {
+  transform: skewX(var(--skew)) translateY(-3px) scale(0.98);
+  box-shadow: 
+    0 4px 14px rgba(0, 0, 0, 0.5),
+    inset 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.btHand .handButton.active {
+  border-color: var(--ak-accent);
+  box-shadow: 
+    0 8px 24px rgba(255, 216, 0, 0.6),
+    0 0 0 3px rgba(255, 216, 0, 0.3),
+    0 0 30px rgba(255, 216, 0, 0.4);
+  transform: skewX(var(--skew)) translateY(-6px);
+  animation: activeCardPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes activeCardPulse {
+  0%, 100% {
+    box-shadow: 
+      0 8px 24px rgba(255, 216, 0, 0.6),
+      0 0 0 3px rgba(255, 216, 0, 0.3),
+      0 0 30px rgba(255, 216, 0, 0.4);
+  }
+  50% {
+    box-shadow: 
+      0 10px 28px rgba(255, 216, 0, 0.7),
+      0 0 0 3px rgba(255, 216, 0, 0.5),
+      0 0 40px rgba(255, 216, 0, 0.6);
+  }
+}
+
+/* —— 冷却状态 —— */
+.btHand .handButton.cooldown {
+  filter: grayscale(0.8) brightness(0.7);
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.btHand .handButton.cooldown:hover {
+  transform: skewX(var(--skew)) translateY(-2px);
+  box-shadow: 
+    0 6px 16px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* 冷却倒计时数字增强 */
+.btHand .handButton .hbCd {
+  background: rgba(12, 15, 20, 0.88);
+  backdrop-filter: blur(4px);
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--ak-accent);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+  animation: cooldownPulse 1s ease-in-out infinite;
+}
+
+@keyframes cooldownPulse {
+  0%, 100% { opacity: 0.9; }
+  50% { opacity: 1; }
+}
+
+/* —— 费用不足状态 —— */
+.btHand .handButton.insufficient {
+  border-color: rgba(255, 91, 74, 0.6);
+  box-shadow: 
+    0 6px 16px rgba(0, 0, 0, 0.45),
+    0 0 12px rgba(255, 91, 74, 0.3);
+}
+
+.btHand .handButton.insufficient:hover {
+  border-color: rgba(255, 91, 74, 0.8);
+  transform: skewX(var(--skew)) translateY(-2px);
+}
+
+.btHand .handButton.insufficient .hbCost {
+  color: var(--ak-red);
+  animation: insufficientShake 0.5s ease-in-out;
+}
+
+@keyframes insufficientShake {
+  0%, 100% { transform: skewX(calc(var(--skew) * -1)) translateX(0); }
+  25% { transform: skewX(calc(var(--skew) * -1)) translateX(-3px); }
+  75% { transform: skewX(calc(var(--skew) * -1)) translateX(3px); }
+}
+
+/* —— 已部署状态增强 —— */
+.btHand .handButton.onField {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: linear-gradient(135deg, 
+    rgba(32, 35, 41, 0.95), 
+    rgba(24, 27, 33, 0.98)
+  );
+  opacity: 0.7;
+}
+
+.btHand .handButton.onField img {
+  filter: grayscale(1) brightness(0.45);
+}
+
+.btHand .handButton.onField:hover {
+  opacity: 0.85;
+  transform: skewX(var(--skew)) translateY(-2px);
+}
+
+/* ========================================
+   召唤物卡片样式
+   ======================================== */
+
+/* 召唤物卡片基础样式 */
+.btHand .handButton.handButton--summon {
+  background: linear-gradient(135deg, 
+    rgba(160, 120, 180, 0.25), 
+    rgba(120, 90, 140, 0.35),
+    rgba(100, 70, 120, 0.4)
+  );
+  border: 2px solid rgba(200, 150, 220, 0.65);
+  box-shadow: 
+    0 6px 16px rgba(80, 40, 100, 0.5),
+    0 0 16px rgba(200, 150, 220, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* 召唤物悬停效果 */
+.btHand .handButton.handButton--summon:hover:not(.dead):not(.cooldown) {
+  transform: skewX(var(--skew)) translateY(-5px) scale(1.02);
+  border-color: rgba(220, 170, 240, 0.9);
+  box-shadow: 
+    0 10px 28px rgba(100, 60, 120, 0.7),
+    0 0 24px rgba(200, 150, 220, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+/* 召唤物标签 */
+.btHand .handButton .hbSummonBadge {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  padding: 3px 8px;
+  background: rgba(180, 130, 200, 0.95);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  border-radius: 3px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  z-index: 2;
+  transform: skewX(calc(var(--skew) * -1));
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+/* 召唤物数量显示 */
+.btHand .handButton .hbSummonCount {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  padding: 4px 10px;
+  background: rgba(12, 15, 20, 0.92);
+  color: var(--ak-accent);
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  border: 1px solid rgba(200, 150, 220, 0.6);
+  border-radius: 4px;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+  z-index: 2;
+  transform: skewX(calc(var(--skew) * -1));
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* 召唤物图标/占位符 */
+.btHand .handButton .hbSummonIcon {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 48px;
+  opacity: 0.8;
+  z-index: 1;
+  pointer-events: none;
+  transform: skewX(calc(var(--skew) * -1));
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.6));
+}
+
+/* 召唤物名称样式调整 */
+.btHand .handButton.handButton--summon .hbName {
+  background: rgba(160, 120, 180, 0.92);
+  color: #fff;
+  font-weight: 700;
+}
+
+/* 召唤物费用显示 */
+.btHand .handButton.handButton--summon .hbCost {
+  background: rgba(160, 120, 180, 0.92);
+  border-color: rgba(200, 150, 220, 0.6);
+  color: #ffe8ff;
+}
+
+/* 召唤物激活状态 */
+.btHand .handButton.handButton--summon.active {
+  border-color: rgba(220, 170, 240, 1);
+  box-shadow: 
+    0 8px 24px rgba(150, 100, 180, 0.7),
+    0 0 0 3px rgba(220, 170, 240, 0.4),
+    0 0 35px rgba(200, 150, 220, 0.5);
+  animation: activeSummonPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes activeSummonPulse {
+  0%, 100% {
+    box-shadow: 
+      0 8px 24px rgba(150, 100, 180, 0.7),
+      0 0 0 3px rgba(220, 170, 240, 0.4),
+      0 0 35px rgba(200, 150, 220, 0.5);
+  }
+  50% {
+    box-shadow: 
+      0 10px 28px rgba(170, 120, 200, 0.8),
+      0 0 0 3px rgba(220, 170, 240, 0.6),
+      0 0 45px rgba(200, 150, 220, 0.7);
+  }
+}
+
+/* 召唤物冷却状态 */
+.btHand .handButton.handButton--summon.cooldown {
+  filter: grayscale(0.9) brightness(0.6);
+  opacity: 0.6;
+}
+
+/* 召唤物已部署 */
+.btHand .handButton.handButton--summon.onField {
+  background: linear-gradient(135deg, 
+    rgba(80, 60, 90, 0.4), 
+    rgba(60, 45, 70, 0.5)
+  );
+  border-color: rgba(150, 120, 170, 0.3);
+}
+
+/* ========================================
+   响应式优化
+   ======================================== */
+
+/* 小屏幕优化 */
+@media (max-width: 900px) {
+  .btHand .handButton {
+    box-shadow: 
+      0 4px 12px rgba(0, 0, 0, 0.45),
+      inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  }
+  
+  .btHand .handButton:hover:not(.dead):not(.onField):not(.cooldown) {
+    transform: skewX(var(--skew)) translateY(-3px) scale(1.01);
+  }
+  
+  .btHand .handButton .hbSummonBadge {
+    font-size: 9px;
+    padding: 2px 6px;
+  }
+  
+  .btHand .handButton .hbSummonCount {
+    font-size: 16px;
+    padding: 3px 8px;
+  }
+  
+  .btHand .handButton .hbSummonIcon {
+    font-size: 36px;
+  }
+}
+
+/* 矮屏幕优化 */
+@media (max-height: 760px) {
+  .btHand .handButton .hbCd {
+    font-size: 22px;
+  }
+  
+  .btHand .handButton .hbSummonIcon {
+    font-size: 40px;
+  }
+}
+
+@media (max-height: 540px) {
+  .btHand .handButton .hbSummonBadge {
+    font-size: 8px;
+    padding: 2px 5px;
+  }
+  
+  .btHand .handButton .hbSummonCount {
+    font-size: 14px;
+    padding: 2px 6px;
+  }
+  
+  .btHand .handButton .hbSummonIcon {
+    font-size: 32px;
+  }
+}
+
+/* ========================================
+   性能优化
+   ======================================== */
+
+/* 禁用动画以提升性能（可选） */
+@media (prefers-reduced-motion: reduce) {
+  .btHand .handButton {
+    animation: none;
+    transition: none;
+  }
+  
+  .btHand .handButton.active {
+    animation: none;
+  }
+  
+  .btHand .handButton .hbCd {
+    animation: none;
+  }
+}
+
+/* 触摸设备优化 */
+@media (hover: none) and (pointer: coarse) {
+  .btHand .handButton {
+    /* 增大点击区域 */
+    touch-action: manipulation;
+  }
+  
+  .btHand .handButton:hover {
+    /* 移除悬停效果 */
+    transform: skewX(var(--skew)) translateY(0);
+  }
+  
+  /* 触摸反馈 */
+  .btHand .handButton:active:not(.dead):not(.onField) {
+    transform: skewX(var(--skew)) scale(0.96);
+    transition: transform 0.1s ease;
+  }
+}
+
+/* ========================================
+   辅助功能
+   ======================================== */
+
+/* 焦点可见性 */
+.btHand .handButton:focus-visible {
+  outline: 3px solid #8bd9ff;
+  outline-offset: 4px;
+  z-index: 11;
+}
+
+/* 高对比度模式支持 */
+@media (prefers-contrast: high) {
+  .btHand .handButton {
+    border-width: 3px;
+  }
+  
+  .btHand .handButton.handButton--summon {
+    border-width: 3px;
+    border-color: rgba(220, 170, 240, 0.9);
+  }
+  
+  .btHand .handButton .hbSummonBadge {
+    background: rgba(180, 130, 200, 1);
+    font-weight: 900;
+  }
+}
