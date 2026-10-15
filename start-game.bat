@@ -43,11 +43,21 @@ if not exist "public\assets\spine\back-index.json" (
 
 REM ---- 3) Start server and open browser ----
 if not defined PORT set "PORT=8788"
+
+REM Already running? (a previous window may still hold the port) -> just open the browser
+netstat -ano | findstr /R /C:":%PORT% .*LISTENING" >nul 2>&1
+if not errorlevel 1 (
+    echo [3/3] A server is ALREADY running on port %PORT%.
+    echo       Opening the browser. If you want a fresh start, close that
+    echo       other window first, or run with another port:
+    echo           set PORT=8789
+    echo.
+    start "" http://127.0.0.1:%PORT%
+    timeout /t 4 >nul
+    exit /b 0
+)
+
 echo [3/3] Starting server...
-echo.
-echo   Local : http://127.0.0.1:%PORT%
-echo   LAN   : use the address printed below, share it with your opponent
-echo   Stop  : press Ctrl+C in this window
 echo.
 
 start "" http://127.0.0.1:%PORT%

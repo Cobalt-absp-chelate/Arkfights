@@ -583,15 +583,49 @@ setInterval(() => {
   }
 }, 50);
 
+// 端口占用：明确报错并退出（否则进程会“活着但没在监听”，让人以为启动成功了）
+server.on('error', (err) => {
+  if (err && err.code === 'EADDRINUSE') {
+    console.error('');
+    console.error(`[ERROR] Port ${PORT} is already in use.`);
+    console.error('        Another ArkFights server (or another program) is using it.');
+    console.error('        Either close that window, or start on another port:');
+    console.error(`            set PORT=${PORT + 1}`);
+    console.error('            start-game.bat');
+    console.error('');
+    process.exit(1);
+    return;
+  }
+  throw err;
+});
+
 server.listen(PORT, HOST, () => {
-  const addresses = [];
-  for (const entries of Object.values(os.networkInterfaces())) {
+  // 真实局域网地址：排除 WSL / VMware / VirtualBox / Hyper-V / Docker 等虚拟网卡，
+  // 它们给出的地址对手连不上，混在一起会让人不知道分享哪个。
+  const VIRTUAL = /(wsl|vmware|virtualbox|vbox|hyper-v|docker|loopback|tailscale|zerotier|radmin|npcap|bluetooth)/i;
+  const real = [];
+  const virtual = [];
+  for (const [name, entries] of Object.entries(os.networkInterfaces())) {
     for (const entry of entries || []) {
-      if (entry.family === 'IPv4' && !entry.internal) addresses.push(entry.address);
+      if (entry.family !== 'IPv4' || entry.internal) continue;
+      if (entry.address.startsWith('169.254.')) continue;
+      (VIRTUAL.test(name) ? virtual : real).push({ name, address: entry.address });
     }
   }
-  console.log('ArkFights prototype server running.');
-  console.log(`Local:   http://127.0.0.1:${PORT}`);
-  for (const address of addresses) console.log(`LAN:     http://${address}:${PORT}`);
-  console.log('This project only serves ArkFights files and never writes to the Arknights installation.');
+  console.log('ArkFights server running.');
+  console.log('');
+  console.log(`  Local :  http://127.0.0.1:${PORT}`);
+  if (real.length) {
+    console.log('  LAN   :  share one of these with your opponent (same Wi-Fi):');
+    for (const a of real) console.log(`             http://${a.address}:${PORT}      [${a.name}]`);
+  } else {
+    console.log('  LAN   :  no physical LAN address found; use 127.0.0.1 for local play.');
+  }
+  if (virtual.length) {
+    console.log('  (ignore these virtual adapters)');
+    for (const a of virtual) console.log(`             http://${a.address}:${PORT}      [${a.name}]`);
+  }
+  console.log('');
+  console.log('  Stop  :  press Ctrl+C');
+  console.log('  This project only serves its own files and never writes to the Arknights installation.');
 });
