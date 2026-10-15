@@ -2,6 +2,8 @@
 
 明日方舟风格的**局域网双人对战**游戏（同人作品，与鹰角网络无关）。
 
+**完全开源 · GPL-3.0-or-later** ｜ 欢迎 fork、改地图、加干员、提 PR。
+
 ---
 
 ## 一键启动
@@ -129,10 +131,17 @@ python scripts/data_gen_roster.py         # 生成干员图鉴数据
 
 本项目为学习交流用的同人作品，《明日方舟》相关素材版权归上海鹰角网络科技有限公司所有。
 
+### 许可
+
+本项目**完全开源**，以 **GPL-3.0-or-later** 发布，全文见 [LICENSE](LICENSE)。你可以自由使用、修改、再分发（包括商用），条件是衍生作品同样以 GPL-3.0-or-later 开源并保留署名。
+
+> 之所以是 GPL 而不是 MIT：`public/projection.js` 的相机 / 投影 / 拾取实现改编自 [Stronghold-Protocol](https://github.com/sgangss/Stronghold-Protocol)（GPL-3.0-or-later），该项目要求衍生部分沿用同一许可，因此整个项目统一为 GPL-3.0-or-later。文件头的原始署名与许可声明请勿移除。
+
 ### 第三方代码与许可
 
 | 组件 | 许可 |
 |------|------|
+| 本项目自身代码 | **GPL-3.0-or-later** |
 | `public/vendor/pixi.min.js`（PIXI.js） | MIT |
 | `public/vendor/pixi-spine.js` / `spine-runtime-3.8.js` | MIT |
 | `public/projection.js` 的相机 / 投影 / 拾取实现 | 改编自 Stronghold-Protocol，**GPL-3.0-or-later**（改编部分沿用 GPL-3.0-or-later） |
