@@ -2269,7 +2269,12 @@
       if (cooling) {
         if (!cd) { cd = document.createElement("span"); cd.className = "hbCd"; btn.appendChild(cd); }
         const txt = `${slot.readyIn}s`;
-        if (cd.textContent !== txt) cd.textContent = txt;
+        // 改写既有文本节点的值（避免 textContent= 反复替换文本节点造成无谓的 DOM 变动）
+        if (cd.firstChild && cd.firstChild.nodeType === 3) {
+          if (cd.firstChild.nodeValue !== txt) cd.firstChild.nodeValue = txt;
+        } else {
+          cd.textContent = txt;
+        }
       } else if (cd) cd.remove();
       let of = btn.querySelector(".hbOnField");
       if (isOnField) {
@@ -6385,6 +6390,25 @@
   // ---------------- 帧循环 ----------------
   let uiRefreshAt = 0;
   let miniRefreshAt = 0;   // 小地图 5Hz 节流（4-6Hz 视觉不卡；地形在离屏缓存里，低频重绘无感）
+  // 演示/教程模式：战场时钟独立推进，不挂在 rAF 上。
+  // rAF 在掉帧、后台标签、无头浏览器里会被暂停或降频，而帧内 dt 又被钳在 0.05s，
+  // 时钟就会“停住”。这里按真实经过时间以固定 100ms 步长补步（单次上限 0.5s，避免切回标签时瞬跳）。
+  let demoTickAt = 0;
+  setInterval(() => {
+    if (!state.localBattle || !state.localSim || state.screen !== "battle") { demoTickAt = 0; return; }
+    const tickNow = (typeof performance !== "undefined" && performance.now) ? performance.now() : Date.now();
+    if (!demoTickAt) { demoTickAt = tickNow; return; }
+    const step = Math.min(0.5, Math.max(0, (tickNow - demoTickAt) / 1000));
+    demoTickAt = tickNow;
+    if (step <= 0) return;
+    try {
+      state.localSim.tick(state.localBattle, step);
+      applySnapshot(state.localSim.snapshot(state.localBattle));
+      if (state.localBattle.winner && !state.resultShown) showResult(state.view, state.localBattle.winner);
+    } catch (demoErr) {
+      if (frame._demoErr !== String(demoErr)) { frame._demoErr = String(demoErr); console.error("demo tick error", demoErr); }
+    }
+  }, 100);
   function frame(now) {
     window.__FRAME_N__ = (window.__FRAME_N__ || 0) + 1;   // 帧活性诊断计数（只读）
     try {
@@ -6403,13 +6427,7 @@
     }
     if (state.screen === "battle") {
       resizeBoards();
-      if (state.localBattle) {
-        state.localSim.tick(state.localBattle, dt);
-        applySnapshot(state.localSim.snapshot(state.localBattle));
-        if (state.localBattle.winner && !state.resultShown) {
-          showResult(state.view, state.localBattle.winner);
-        }
-      }
+      // 演示/教程的战场时钟由下方固定步长计时器推进（不挂在 rAF 上），这里只负责渲染
       draw();
       const cam = battleCam();
       spineLayer.sync(state.view, cam).catch(() => {});
