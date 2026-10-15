@@ -35,7 +35,7 @@ try {
   globalThis.window = globalThis;                 // maps.js 以 window.AKF_MAPS = {...} 形式导出
   require(path.join(PUBLIC_DIR, 'maps.js'));
 } catch (mapsErr) {
-  console.error('[警告] 载入 public/maps.js 失败，本局仅可用内置地图：', mapsErr && mapsErr.message);
+  console.error('[warn] failed to load public/maps.js, only built-in maps are available:', mapsErr && mapsErr.message);
 }
 // 测试专用：缩短蓝门血量以便快速跑完整局（ARK_GATE_HP 环境变量，默认不动玩法）
 if (process.env.ARK_GATE_HP) DATA.balance.gateHp = Math.max(1, Number(process.env.ARK_GATE_HP) || DATA.balance.gateHp);

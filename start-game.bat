@@ -1,58 +1,58 @@
 @echo off
-chcp 65001 >nul
-title ArkFights 启动器
+setlocal
 cd /d "%~dp0"
+title ArkFights Launcher
 
 echo ========================================
-echo    ArkFights - 明日方舟风格双人对战
+echo    ArkFights - Tactical Duel (LAN PvP)
 echo ========================================
 echo.
 
-REM ---- 1) 检查 Node.js ----
+REM ---- 1) Check Node.js ----
 where node >nul 2>&1
 if errorlevel 1 (
-    echo [错误] 未检测到 Node.js
+    echo [ERROR] Node.js not found.
     echo.
-    echo 请先安装 Node.js ^(18 或更高版本^)：https://nodejs.org
-    echo 安装后重新双击本脚本即可。
+    echo Please install Node.js ^(18 or newer^) from https://nodejs.org
+    echo Then run this file again.
     echo.
     pause
     exit /b 1
 )
-for /f "tokens=*" %%v in ('node -v') do set NODEVER=%%v
-echo [1/3] Node.js 已就绪 %NODEVER%
+for /f "delims=" %%v in ('node -v') do set "NODEVER=%%v"
+echo [1/3] Node.js %NODEVER% OK
 
-REM ---- 2) 首次运行：解压模型资源 ----
+REM ---- 2) First run: extract operator model assets ----
 if not exist "public\assets\spine\back-index.json" (
-    echo [2/3] 首次运行：正在解压干员模型资源，请稍候...
+    echo [2/3] First run: extracting model assets, please wait...
     if not exist "spine-assets.zip" (
-        echo [错误] 找不到 spine-assets.zip
-        echo 请确认它和本脚本在同一目录下。
+        echo [ERROR] spine-assets.zip not found next to this script.
         pause
         exit /b 1
     )
     powershell -NoProfile -ExecutionPolicy Bypass -Command "Expand-Archive -LiteralPath '%~dp0spine-assets.zip' -DestinationPath '%~dp0public\assets' -Force"
     if not exist "public\assets\spine\back-index.json" (
-        echo [错误] 解压失败，请手动解压 spine-assets.zip 到 public\assets\
+        echo [ERROR] Extraction failed. Please unzip spine-assets.zip into public\assets\ manually.
         pause
         exit /b 1
     )
-    echo       解压完成
+    echo       Extraction done.
 ) else (
-    echo [2/3] 模型资源已就绪
+    echo [2/3] Model assets OK
 )
 
-REM ---- 3) 启动服务器并打开浏览器 ----
-echo [3/3] 正在启动服务器...
+REM ---- 3) Start server and open browser ----
+if not defined PORT set "PORT=8788"
+echo [3/3] Starting server...
 echo.
-echo   本机访问：http://127.0.0.1:8788
-echo   联机方式：把下面显示的局域网地址发给对手
-echo   停止服务：在本窗口按 Ctrl+C
+echo   Local : http://127.0.0.1:%PORT%
+echo   LAN   : use the address printed below, share it with your opponent
+echo   Stop  : press Ctrl+C in this window
 echo.
 
-start "" http://127.0.0.1:8788
+start "" http://127.0.0.1:%PORT%
 node server.js
 
 echo.
-echo 服务器已停止。
+echo Server stopped.
 pause
